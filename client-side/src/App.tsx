@@ -5,12 +5,11 @@ import { Route, Routes, Navigate } from "react-router-dom";
 
 function App() {
   return (
-    
-    <div className="min-h-[100dvh] w-full bg-white font-play">
+    <div className="min-h-[100dvh] w-full bg-white">
       <Routes>
-      <Route path="*" element={<Navigate to="/" />} />
-      <Route element={<Home />} path="/" />
-      <Route element={<Login />} path="/login" />
+        <Route path="*" element={<Navigate to="/" />} />
+        <Route element={<Home />} path="/" />
+        <Route element={<Login />} path="/login" />
       </Routes>
     </div>
   );
