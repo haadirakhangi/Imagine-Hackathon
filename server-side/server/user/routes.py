@@ -52,9 +52,7 @@ def register():
         # Parse form data
         data = request.form
         required_fields = [
-            "full_name", "age", "location", "preferred_language", "email", "password", "gender",
-            "highest_education", "field_of_study", "dream_job", "interests", "challenges",
-            "motivation", "learning_platforms", "top_skills"
+            "full_name", "email", "password", "gender", "highest_education", "dream_job", "top_skills"
         ]
 
         # Validate required fields
@@ -77,13 +75,11 @@ def register():
 
         hashed_password = generate_password_hash(data["password"])
         top_skills = data["top_skills"].split(",")
-        interests = data["interests"].split(",")
         # Insert student data into MongoDB
         student_data = {field: data[field] for field in required_fields}
         student_data['password'] = hashed_password # Store the hashed password
         student_data['resume_id'] = str(resume_id)  # Save the GridFS file ID
         student_data['top_skills'] = top_skills
-        student_data['interests'] = interests
 
         std_profile_coll.insert_one(student_data)
 

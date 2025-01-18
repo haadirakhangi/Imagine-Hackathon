@@ -9,7 +9,6 @@ import os
 import asyncio
 from pykka import ThreadingActor
 from concurrent.futures import ThreadPoolExecutor
-from pykka import ThreadingActor
 
 class ResultHandler(ThreadingActor):
     async def receive(self, message):
