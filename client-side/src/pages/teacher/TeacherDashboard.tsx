@@ -35,7 +35,7 @@ const TeacherDashboard = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get('/api/teacher/get-courses');
+        const response = await axios.get('/api/company/get-courses');
         setCourses(response.data.courses);
       } catch (error) {
         console.error('Error fetching courses:', error);

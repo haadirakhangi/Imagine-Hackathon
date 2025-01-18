@@ -105,7 +105,7 @@ const LessonCreate = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/teacher/multimodal-rag-submodules', formData, {
+      const response = await axios.post('/api/company/multimodal-rag-submodules', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -136,7 +136,7 @@ const LessonCreate = () => {
 
   const handleModalSubmit = async (updatedSubmodules: Record<string, string>) => {
     try {
-      const response = await axios.post('/api/teacher/update-submodules', updatedSubmodules);
+      const response = await axios.post('/api/company/update-submodules', updatedSubmodules);
 
       if (response.status === 200) {
         toast({

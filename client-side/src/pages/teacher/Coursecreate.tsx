@@ -85,7 +85,7 @@ const CourseCreate = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/teacher/generate-lesson', formData, {
+      const response = await axios.post('/api/company/generate-lesson', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -121,7 +121,7 @@ const CourseCreate = () => {
       formData.append('course_name', values.CourseName);
       formData.append('num_lectures', values.NumLects);
       formData.append('lessons', JSON.stringify(lessonData));
-      const response = await axios.post('/api/teacher/create-course', formData);
+      const response = await axios.post('/api/company/create-course', formData);
       localStorage.setItem('course_name', response.data.course_name);
       localStorage.setItem('course_id', response.data.course_id);
 

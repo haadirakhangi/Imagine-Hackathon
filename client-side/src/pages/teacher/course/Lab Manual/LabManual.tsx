@@ -24,7 +24,7 @@ const LabManual: React.FC = () => {
         const exp_aim = localStorage.getItem('exp_aim');
 
         try {
-            const response = await axios.post('/api/teacher/add-lab-manual', {
+            const response = await axios.post('/api/company/add-lab-manual', {
                 markdown_content: markdownContent,
                 uploaded_images: uploadedImages,
                 course_id: course_id,
@@ -67,7 +67,7 @@ const LabManual: React.FC = () => {
     const downloadDocxFile = async () => {
         try {
             const response = await axios.post(
-                '/api/teacher/create-lab-manual-docx',
+                '/api/company/create-lab-manual-docx',
                 { lab_manual_id:  lab_manual_id},
                 {
                     responseType: 'blob',
@@ -101,7 +101,7 @@ const LabManual: React.FC = () => {
                     const include_videos = formData.include_videos;
                     const exp_num = formData.exp_num;
                     const lab_components = formData.lab_components;
-                    const response = await axios.post('/api/teacher/generate-lab-manual', {
+                    const response = await axios.post('/api/company/generate-lab-manual', {
                         course_name,
                         exp_aim,
                         include_videos,
@@ -114,7 +114,7 @@ const LabManual: React.FC = () => {
                     console.error("Error fetching content:", error);
                 }
             } else {
-                const response = await axios.post('/api/teacher/fetch-lab-manual', {
+                const response = await axios.post('/api/company/fetch-lab-manual', {
                     lab_manual_id: lab_manual_id
                 }, { withCredentials: true });
                 const umg = JSON.parse(response.data.uploaded_images);

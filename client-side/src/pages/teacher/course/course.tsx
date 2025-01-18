@@ -37,7 +37,7 @@ const PerContent: React.FC = () => {
         
 
         try {
-            const response = await axios.post('/api/teacher/add-lesson', {
+            const response = await axios.post('/api/company/add-lesson', {
                 title: lesson_name,
                 markdown_content: data,
                 // relevant_images: images,
@@ -63,7 +63,7 @@ const PerContent: React.FC = () => {
             const lesson_id = localStorage.getItem('lesson_id');
     
             const response = await axios.post(
-                '/api/teacher/download-ppt',
+                '/api/company/download-ppt',
                 {
                     course_id: course_id,
                     lesson_id: lesson_id,
@@ -167,13 +167,13 @@ const PerContent: React.FC = () => {
         const fetchData = async () => {
             try {
                 if (lesson_id==null) {
-                    const response = await axios.get('/api/teacher/multimodal-rag-content', { withCredentials: true });
+                    const response = await axios.get('/api/company/multimodal-rag-content', { withCredentials: true });
                     setImages(response.data.relevant_images);
                     setData(response.data.content);
                     setApiCalled(true);
                     setSelectedSubmodule(Object.keys(response.data.content[0] || {})[0]);
                 }else{
-                    const response = await axios.post('/api/teacher/get-lesson',{
+                    const response = await axios.post('/api/company/get-lesson',{
                         lesson_id: lesson_id
                     }, { withCredentials: true });
                     const mk = JSON.parse(response.data.markdown_content);

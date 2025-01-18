@@ -109,8 +109,8 @@ const Login = () => {
           </Box>
           <Tabs isFitted variant='soft-rounded' colorScheme='purple' onChange={(index) => setActiveTab(index)}>
             <TabList>
-              <Tab>Student</Tab>
-              <Tab>Teacher</Tab>
+              <Tab>User</Tab>
+              <Tab>Company</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -146,7 +146,7 @@ const Login = () => {
 
               <TabPanel>
                 <Box my={8} textAlign='left'>
-                  <form onSubmit={studentForm.handleSubmit((data) => handleLogin(data, '/api/teacher/login'))}>
+                  <form onSubmit={studentForm.handleSubmit((data) => handleLogin(data, '/api/company/login'))}>
                     <FormControl isInvalid={!!studentForm.formState.errors.email}>
                       <FormLabel>Email address</FormLabel>
                       <Input type='email' placeholder='Enter your email address' {...studentForm.register('email')} />

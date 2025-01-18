@@ -13,6 +13,7 @@ import {
   Stack,
   Text,
   useToast,
+  Flex,
 } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -110,139 +111,147 @@ const StudentRegister = () => {
   return (
     <div>
       <Navbar />
-      <Box
-        bg={useColorModeValue('purple.200', 'purple.800')}
-        minHeight="100vh"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        padding={4}
-      >
-        <Box
-          rounded="lg"
-          bg={useColorModeValue('white', 'gray.900')}
-          shadow="lg"
-          width={'50%'}
-          p={6}
+      <Flex bg={useColorModeValue('purple.200', 'purple.800')} direction="column" width='full' align='center' justifyContent='center' minHeight={"100vh"}>
+        <Text fontSize="4xl"
+          fontWeight="bold"
+          color={useColorModeValue('purple.800', 'purple.100')}
+          mb={4}
+          mt={8}
         >
-          <Text fontSize="2xl" fontWeight="bold" textAlign="center" mb={6}>
-            Student Registration
-          </Text>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <FormControl isInvalid={!!errors.fullName} mb={4}>
-              <FormLabel>Full Name</FormLabel>
-              <Input
-                type="text"
-                placeholder="Enter your full name"
-                {...register('fullName')}
-              />
-              <FormErrorMessage>{errors.fullName?.message}</FormErrorMessage>
-            </FormControl>
+          Teacher Registration
+        </Text>
+        <Box
+          bg={useColorModeValue('purple.200', 'purple.800')}
+          minHeight="100vh"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          padding={4}
+          width={'100%'}
+        >
+          <Box
+            rounded="lg"
+            bg={useColorModeValue('white', 'gray.900')}
+            shadow="lg"
+            width={'50%'}
+            p={6}
+          >
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <FormControl isInvalid={!!errors.fullName} mb={4}>
+                <FormLabel>Full Name</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Enter your full name"
+                  {...register('fullName')}
+                />
+                <FormErrorMessage>{errors.fullName?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.email} mb={4}>
-              <FormLabel>Email</FormLabel>
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                {...register('email')}
-              />
-              <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.email} mb={4}>
+                <FormLabel>Email</FormLabel>
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  {...register('email')}
+                />
+                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.password} mb={4}>
-              <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
-                placeholder="Enter your password"
-                {...register('password')}
-              />
-              <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.password} mb={4}>
+                <FormLabel>Password</FormLabel>
+                <Input
+                  type="password"
+                  placeholder="Enter your password"
+                  {...register('password')}
+                />
+                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.confirmPassword} mb={4}>
-              <FormLabel>Confirm Password</FormLabel>
-              <Input
-                type="password"
-                placeholder="Re-enter your password"
-                {...register('confirmPassword')}
-              />
-              <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.confirmPassword} mb={4}>
+                <FormLabel>Confirm Password</FormLabel>
+                <Input
+                  type="password"
+                  placeholder="Re-enter your password"
+                  {...register('confirmPassword')}
+                />
+                <FormErrorMessage>{errors.confirmPassword?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.gender} mb={4}>
-              <FormLabel>Gender</FormLabel>
-              <RadioGroup>
-                <Stack direction="row">
-                  <Radio value="male" {...register('gender')}>
-                    Male
-                  </Radio>
-                  <Radio value="female" {...register('gender')}>
-                    Female
-                  </Radio>
-                  <Radio value="other" {...register('gender')}>
-                    Other
-                  </Radio>
-                </Stack>
-              </RadioGroup>
-              <FormErrorMessage>{errors.gender?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.gender} mb={4}>
+                <FormLabel>Gender</FormLabel>
+                <RadioGroup>
+                  <Stack direction="row">
+                    <Radio value="male" {...register('gender')}>
+                      Male
+                    </Radio>
+                    <Radio value="female" {...register('gender')}>
+                      Female
+                    </Radio>
+                    <Radio value="other" {...register('gender')}>
+                      Other
+                    </Radio>
+                  </Stack>
+                </RadioGroup>
+                <FormErrorMessage>{errors.gender?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.highestEducation} mb={4}>
-              <FormLabel>Highest Education</FormLabel>
-              <RadioGroup>
-                <Stack direction="column">
-                  <Radio value="High School (10th grade)" {...register('highestEducation')}>
-                    High School (10th grade)
-                  </Radio>
-                  <Radio
-                    value="Higher Secondary (12th grade) or Diploma"
-                    {...register('highestEducation')}
-                  >
-                    Higher Secondary (12th grade) or Diploma
-                  </Radio>
-                  <Radio value="Undergraduate Degree" {...register('highestEducation')}>
-                    Undergraduate Degree
-                  </Radio>
-                  <Radio value="Postgraduate Degree" {...register('highestEducation')}>
-                    Postgraduate Degree
-                  </Radio>
-                </Stack>
-              </RadioGroup>
-              <FormErrorMessage>{errors.highestEducation?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.highestEducation} mb={4}>
+                <FormLabel>Highest Education</FormLabel>
+                <RadioGroup>
+                  <Stack direction="column">
+                    <Radio value="High School (10th grade)" {...register('highestEducation')}>
+                      High School (10th grade)
+                    </Radio>
+                    <Radio
+                      value="Higher Secondary (12th grade) or Diploma"
+                      {...register('highestEducation')}
+                    >
+                      Higher Secondary (12th grade) or Diploma
+                    </Radio>
+                    <Radio value="Undergraduate Degree" {...register('highestEducation')}>
+                      Undergraduate Degree
+                    </Radio>
+                    <Radio value="Postgraduate Degree" {...register('highestEducation')}>
+                      Postgraduate Degree
+                    </Radio>
+                  </Stack>
+                </RadioGroup>
+                <FormErrorMessage>{errors.highestEducation?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.dreamJob} mb={4}>
-              <FormLabel>Dream Job</FormLabel>
-              <Input
-                type="text"
-                placeholder="Example: Google, Microsoft"
-                {...register('dreamJob')}
-              />
-              <FormErrorMessage>{errors.dreamJob?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.dreamJob} mb={4}>
+                <FormLabel>Dream Job</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="Example: Google, Microsoft"
+                  {...register('dreamJob')}
+                />
+                <FormErrorMessage>{errors.dreamJob?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.topSkills} mb={4}>
-              <FormLabel>Top 5 Skills</FormLabel>
-              <Input
-                type="text"
-                placeholder="E.g., JavaScript, Python, AI, etc."
-                {...register('topSkills')}
-              />
-              <FormErrorMessage>{errors.topSkills?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.topSkills} mb={4}>
+                <FormLabel>Top 5 Skills</FormLabel>
+                <Input
+                  type="text"
+                  placeholder="E.g., JavaScript, Python, AI, etc."
+                  {...register('topSkills')}
+                />
+                <FormErrorMessage>{errors.topSkills?.message}</FormErrorMessage>
+              </FormControl>
 
-            <FormControl isInvalid={!!errors.resume} mb={4}>
-              <FormLabel>Resume (PDF only)</FormLabel>
-              <Input type="file" accept="application/pdf" {...register('resume')} />
-              <FormErrorMessage>{errors.resume?.message}</FormErrorMessage>
-            </FormControl>
+              <FormControl isInvalid={!!errors.resume} mb={4}>
+                <FormLabel>Resume (PDF only)</FormLabel>
+                <Input type="file" accept="application/pdf" {...register('resume')} />
+                <FormErrorMessage>{errors.resume?.message}</FormErrorMessage>
+              </FormControl>
 
-            <Button type="submit" colorScheme="purple" width="full" mt={4}>
-              Submit
-            </Button>
-          </form>
+              <Button type="submit" colorScheme="purple" width="full" mt={4}>
+                Submit
+              </Button>
+            </form>
+          </Box>
         </Box>
-      </Box>
+      </Flex>
     </div>
   );
 };

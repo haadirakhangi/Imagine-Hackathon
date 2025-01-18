@@ -63,7 +63,7 @@ export const Navbar = () => {
 
     const handleTeacherLogout = async () => {
         try {
-            await axios.get('/api/teacher/logout', { withCredentials: true });
+            await axios.get('/api/company/logout', { withCredentials: true });
             setTeacherAuthenticated(false);
             sessionStorage.removeItem('teacher_authenticated');
             localStorage.clear();
@@ -180,11 +180,11 @@ export const Navbar = () => {
                                 <MenuList>
                                     <MenuItem onClick={() => navigate("/register/student")}>
                                     <PiStudent size={20} style={{ marginRight: 8 }} />
-                                        <span>Student Registration</span>
+                                        <span>User Registration</span>
                                     </MenuItem>
                                     <MenuItem onClick={() => navigate("/register/teacher")}>
                                     <GiTeacher size={20} style={{ marginRight: 8 }} />
-                                        <span>Teacher Registration</span>
+                                        <span>Company Registration</span>
                                     </MenuItem>
                                 </MenuList>
                             </Menu>
