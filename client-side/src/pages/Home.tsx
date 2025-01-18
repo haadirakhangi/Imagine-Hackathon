@@ -47,7 +47,7 @@ const Home = () => {
       <div className="w-full flex-grow flex items-center">
         <div className="md:w-[80%] px-4 md:px-0 mx-auto flex flex-col md:flex-row gap-4">
           <div className="md:w-3/5 mt-6 md:mt-0 flex flex-col md:gap-6 gap-4">
-            <p className="text-2xl md:text-5xl font-bold text-indigo-600">
+            <p className="poppins-regular text-2xl md:text-5xl font-bold text-indigo-600">
               Level Up Your Skills, Unlock Your Future.
             </p>
             <p>
