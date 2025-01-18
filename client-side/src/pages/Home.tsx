@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import landingIcon from "../assets/landingIcon.png";
+import { NavLink } from "react-router-dom";
 
 const Home = () => {
   const [showRegisterOptions, setShowRegisterOptions] = useState(false);
@@ -11,9 +12,11 @@ const Home = () => {
         <p className="font-bold text-xl italic">Aspire AI </p>
 
         <div className="hidden md:flex gap-4 bg-white ">
-          <p className="rounded-lg p-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 active:text-indigo-600">
-            Log In
-          </p>
+          <NavLink to='/login'>
+            <p className="rounded-lg p-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 active:text-indigo-600">
+              Log In
+            </p>
+          </NavLink>
           <div className="relative rounded-lg ">
             <p
               className=" rounded-lg p-2 px-3 bg-indigo-500 hover:bg-indigo-600 active:bg-indigo-600 text-white font-semibold duration-200"
