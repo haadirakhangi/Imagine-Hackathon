@@ -4,8 +4,8 @@ const Login = () => {
   const [selected, setSelected] = useState("fd");
 
   return (
-    <div className="min-h-[100dvh] w-full p-4 flex justify-center items-center">
-      <div className="w-full md:w-4/5 lg:w-3/5 mx-auto rounded-lg p-4 md:p-6 border ">
+    <div className="min-h-[100dvh] w-full p-4 flex justify-center items-center bg-indigo-100">
+      <div className="w-full md:w-4/5 lg:w-3/5 mx-auto rounded-lg p-4 md:p-6 border bg-white">
         <p className="text-2xl md:text-5xl font-bold text-indigo-600">
           Log in to your account
         </p>
