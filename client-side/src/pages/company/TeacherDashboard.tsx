@@ -50,7 +50,7 @@ const TeacherDashboard = () => {
   const handleViewLessons = (course: Course) => {
     localStorage.setItem('course_name', course.course_name);
     localStorage.setItem('course_id', course.id);
-    navigate('/teacher/scheduler');
+    navigate('/company/scheduler');
   };
 
   const handleCopyCourseCode = (courseCode: string) => {

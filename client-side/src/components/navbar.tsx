@@ -105,17 +105,24 @@ export const Navbar = () => {
                 <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }} ml="auto">
                     {teacherAuthenticated && (
                         <>
-                            <NavLink href="/teacher/dashboard">
+                            <NavLink href="/company/dashboard">
                                 <HStack spacing={2}>
                                     <FaHome size={24} />
                                     <span>Home</span>
                                 </HStack>
                             </NavLink>
 
-                            <NavLink href="/teacher/create-course">
+                            <NavLink href="/company/create-course">
                                 <HStack spacing={2}>
                                     <MdCreateNewFolder size={24} />
                                     <span>Create Course</span>
+                                </HStack>
+                            </NavLink>
+
+                            <NavLink href="/company/training-program">
+                                <HStack spacing={2}>
+                                    <MdCreateNewFolder size={24} />
+                                    <span>Create Training Program</span>
                                 </HStack>
                             </NavLink>
 
@@ -182,7 +189,7 @@ export const Navbar = () => {
                                     <PiStudent size={20} style={{ marginRight: 8 }} />
                                         <span>User Registration</span>
                                     </MenuItem>
-                                    <MenuItem onClick={() => navigate("/register/teacher")}>
+                                    <MenuItem onClick={() => navigate("/register/company")}>
                                     <GiTeacher size={20} style={{ marginRight: 8 }} />
                                         <span>Company Registration</span>
                                     </MenuItem>
@@ -205,7 +212,7 @@ export const Navbar = () => {
                 <Box pb={4} display={{ md: 'none' }}>
                     <Stack as={'nav'} spacing={4}>
                         <NavLink href="/">Home</NavLink>
-                        <NavLink href="/teacher/create">Create</NavLink>
+                        <NavLink href="/company/create">Create</NavLink>
                         <NavLink href="/login">Login</NavLink>
                         <Menu>
                             <MenuButton
@@ -226,7 +233,7 @@ export const Navbar = () => {
                                 <MenuItem onClick={() => navigate("/register/student")}>
                                     <span>Student Registration</span>
                                 </MenuItem>
-                                <MenuItem onClick={() => navigate("/register/teacher")}>
+                                <MenuItem onClick={() => navigate("/register/company")}>
                                     <span>Teacher Registration</span>
                                 </MenuItem>
                             </MenuList>

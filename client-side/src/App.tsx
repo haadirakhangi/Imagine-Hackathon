@@ -12,14 +12,14 @@ import JobRoles from "./pages/JobRoles";
 // import "./pages/student/content/i18n"
 import AssessmentPage from "./pages/AssessmentPage";
 
-import TeacherDashboard from "./pages/teacher/TeacherDashboard";
-import CourseCreate from "./pages/teacher/Coursecreate";
-import LessonCreate from "./pages/teacher/Lessoncreate";
-import CoursePage from "./pages/teacher/course/course";
-import LabManual from "./pages/teacher/course/Lab Manual/LabManual";
-import LabManualCreate from "./pages/teacher/course/Lab Manual/LabManualCreate";
-import LessonsGrid from "./pages/teacher/scheduler";
-import TrainingProgram from "./pages/teacher/TrainingProgram";
+import TeacherDashboard from "./pages/company/TeacherDashboard";
+import CourseCreate from "./pages/company/Coursecreate";
+import LessonCreate from "./pages/company/Lessoncreate";
+import CoursePage from "./pages/company/course/course";
+import LabManual from "./pages/company/course/Lab Manual/LabManual";
+import LabManualCreate from "./pages/company/course/Lab Manual/LabManualCreate";
+import LessonsGrid from "./pages/company/scheduler";
+import TrainingProgram from "./pages/company/TrainingProgram";
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
       <Route path="*" element={<Navigate to="/" />} />
       <Route element={<Login />} path="/login" />
       <Route element={<StudentRegister />} path="/register/student" />
-      <Route element={<TeacherRegister />} path="/register/teacher" />
+      <Route element={<TeacherRegister />} path="/register/company" />
       <Route element={<HomePage />} path="/" />
       <Route element={<SoftSkillQuiz />} path="/student/soft-skill-quiz" />
       <Route element={<HardSkillQuiz />} path="/student/technical-quiz" />
@@ -36,14 +36,14 @@ function App() {
       <Route element={<AssessmentPage />} path="/student/assessment" />
       <Route element={<Dashboard />} path="/student/dashboard" />
       <Route element={<JobRoles />} path="/student/job-roles" />
-      <Route element={<TrainingProgram />} path="/teacher/training-program" />
-      <Route element={<TeacherDashboard />} path="/teacher/dashboard" />
-      <Route element={<CourseCreate />} path="/teacher/create-course" />
-      <Route element={<LessonCreate />} path="/teacher/create-lesson" />
-      <Route element={<CoursePage />} path="/teacher/course" />
-      <Route element={<LabManual />} path="/teacher/lab-manual" />
-      <Route element={<LabManualCreate />} path="/teacher/lab-manual-create" />
-      <Route element={<LessonsGrid />} path="/teacher/scheduler" />
+      <Route element={<TrainingProgram />} path="/company/training-program" />
+      <Route element={<TeacherDashboard />} path="/company/dashboard" />
+      <Route element={<CourseCreate />} path="/company/create-course2" />
+      <Route element={<LessonCreate />} path="/company/create-course" />
+      <Route element={<CoursePage />} path="/company/course" />
+      <Route element={<LabManual />} path="/company/lab-manual" />
+      <Route element={<LabManualCreate />} path="/company/lab-manual-create" />
+      <Route element={<LessonsGrid />} path="/company/scheduler" />
 
       
 

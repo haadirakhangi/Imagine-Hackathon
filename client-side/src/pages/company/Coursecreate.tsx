@@ -133,7 +133,7 @@ const CourseCreate = () => {
           duration: 3000,
           isClosable: true,
         });
-        navigate('/teacher/scheduler');
+        navigate('/company/scheduler');
       } else {
         toast({
           title: 'Failed to save lessons',

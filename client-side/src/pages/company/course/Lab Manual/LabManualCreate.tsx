@@ -76,7 +76,7 @@ const LabManualCreate = () => {
         localStorage.setItem('labManualData', JSON.stringify(formData));
     
         // Navigate to a new page after saving
-        navigate('/teacher/lab-manual');  // Update '/new-page' with your actual path
+        navigate('/company/lab-manual');  // Update '/new-page' with your actual path
     };
     
 

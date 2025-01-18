@@ -93,20 +93,20 @@ const LessonsGrid = () => {
   const handleViewLesson = (buttonText: string, name: string, id: Number) => {
     if (buttonText === "Generate") {
       localStorage.setItem('lesson_name', name);
-      navigate('/teacher/create-lesson');
+      navigate('/company/create-lesson');
     } else if (buttonText === "View") {
       localStorage.setItem('lesson_id', id.toString());
-      navigate('/teacher/course');
+      navigate('/company/course');
     }
   };
 
   const handleViewLabMnaual = (id: string) => {
     localStorage.setItem('lab_manual_id', id);
-    navigate('/teacher/lab-manual');
+    navigate('/company/lab-manual');
   };
 
   const handleCreateLabManual = () => {
-    navigate('/teacher/lab-manual-create');
+    navigate('/company/lab-manual-create');
   };
 
   if (loading) {
