@@ -39,11 +39,13 @@ password = quote_plus(os.getenv("MONGO_PASS"))
 uri = "mongodb+srv://mongouser:" + password +"@cluster0.rcrwl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-student_data = client["student_data"]
-std_profile_coll = student_data["profile"]
-job_roles = student_data["job_roles"]
+mongodb = client["IMAGINE"]
+student_data = mongodb["student_data"]
+std_profile_coll = mongodb["profile"]
+job_roles = student_data["job_roles"] ####
+train_program_collection = mongodb["train_programm"]
 
-fs = GridFS(student_data)
+fs = GridFS(mongodb)
 
 @students.route('/register', methods=['POST'])
 @cross_origin(supports_credentials=True)
@@ -265,36 +267,39 @@ def analyze_soft_skill_quiz():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@students.route('/fetch-job-roles', methods=['GET'])
+@students.route("/get-recommendations", methods=["GET"])
 @cross_origin(supports_credentials=True)
-def fetch_job_roles():
-    try:
-        if "student_id" not in session:
+def get_recommendations():
+    if "student_id" not in session:
             return jsonify({"error": "User not logged in"}), 401
+    try:
         student_id = session.get("student_id")
         student = std_profile_coll.find_one({"_id": ObjectId(student_id)})
-        
-        if not student:
-            return jsonify({"error": "Student not found"}), 404
 
-        if "jobroles" in student:
-            return jsonify({"job_roles": student["jobroles"]}), 200
+        student_skills = set([skill.strip().lower() for skill in student.get("top_skills", [])])
+        student_dream_job = student.get("dream_job", "").lower()
+        training_programs = train_program_collection.find()
 
-        top_skills = student.get("top_skills", [])
-        interests = student.get("interests", [])
+            # Recommendations list
+        recommendations = []
 
-        with ThreadPoolExecutor() as executor:
-            future_job_one = executor.submit(SKILLS_ANALYZER.find_job_roles_from_student_skills, top_skills)
-            future_job_two = executor.submit(SKILLS_ANALYZER.find_job_roles_from_interests, interests)
-        
-        job_roles_one = future_job_one.result()
-        job_roles_two = future_job_two.result()
-        all_jobs = {**job_roles_one, **job_roles_two}
-        std_profile_coll.update_one(
-            {"_id": ObjectId(student_id)},
-            {"$set": {"jobroles": all_jobs}}
-        )
-        return jsonify({"job_roles": all_jobs}), 200
+        for program in training_programs:
+            # Extract program skills and job role
+            required_skills = set([skill.strip().lower() for skill in program.get("required_skills", [])])
+            job_role = program.get("job_role", "").lower()
+
+            # Check for skill match or dream job match
+            if student_skills & required_skills or student_dream_job == job_role:
+                recommendations.append({
+                    'id': str(program['_id'])   ,
+                    "job_role": program.get("job_role"),
+                    "job_description": program.get("job_description"),
+                    "required_skills": program.get("required_skills"),
+                    "program_code": program.get("program_code")
+                })
+
+        return jsonify({"recommendations": recommendations}), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -353,7 +358,7 @@ def skill_gap_analysis():
 #             return jsonify({"error": "User not logged in"}), 401
 #         data : dict = request.json
 #         skills = data.get("required_skills")
-#         courses = SERPER_CLIENT.find_courses(skills)
+#         courses = SERPER_CLIENT.find_courses(skills)      
 #         return jsonify({"courses": courses}), 200
 #     except Exception as e:
 #         return jsonify({"error": str(e)}), 500
@@ -457,4 +462,4 @@ def get_assessment_status():
     }
     return jsonify(assessment_status)
 
-    
+

@@ -85,10 +85,15 @@ const TeacherDashboard = () => {
   return (
     <div>
       <Navbar />
-      <Box p={5}>
-        <Heading textAlign="center" mb={6} color="purple.600">
-          My Courses
-        </Heading>
+      <Box p={5} position="relative">
+        <Flex justify="space-between" alignItems="center" mb={6}>
+          <Heading textAlign="center" color="purple.600">
+            My Courses
+          </Heading>
+          <Button colorScheme="purple" onClick={() => navigate('/company/create-course')}>
+            Create New Course
+          </Button>
+        </Flex>
   
         {courses.length === 0 ? (
           <Flex justify="center" align="center" height="50vh">

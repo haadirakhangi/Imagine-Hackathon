@@ -12,7 +12,7 @@ export default function LandingPage() {
             Welcome to{' '}
           </Heading> */}
           {/* <Heading as="h1" size={['4xl', '4xl']} style={{ fontFamily: "Jost" }} color="purple.800" display="inline" letterSpacing={20}>
-            Solo Leveling
+            Aspire AI
           </Heading> */}
         </Box>
         <Flex
@@ -25,7 +25,7 @@ export default function LandingPage() {
               Level Up Your Skills, Unlock Your Future.
             </Heading>
             <Text color="black" className='main-heading' textAlign="justify" size={"10px"}>
-              Welcome to Solo Leveling – the ultimate AI-powered platform designed to help you rise from novice to expert in your chosen career path. Whether you're unsure of where to begin or want to refine what you already know, we guide you step by step. Just like the hero who starts from scratch and becomes unstoppable, this platform helps you discover your strengths, sharpen new skills, and unlock better opportunities. Your journey to greatness starts here – ARISE and level up today!
+              Welcome to Aspire AI – the ultimate AI-powered platform designed to help you rise from novice to expert in your chosen career path. Whether you're unsure of where to begin or want to refine what you already know, we guide you step by step. Just like the hero who starts from scratch and becomes unstoppable, this platform helps you discover your strengths, sharpen new skills, and unlock better opportunities. Your journey to greatness starts here – ARISE and level up today!
             </Text>
             <HStack spacing={2} mt={5} justifyContent={['center', 'flex-start']}> {/* Center buttons on small screens */}
               <Link href='/register'>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   VStack,
@@ -24,23 +24,19 @@ import {
   Textarea,
   HStack,
   IconButton,
-  Radio,
-  RadioGroup,
-  Stack,
+  Select,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from '../../components/navbar';
-import { useDisclosure } from "@chakra-ui/react";
+import { useDisclosure } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ArrowUpIcon, ArrowDownIcon } from "@chakra-ui/icons";
+import { ArrowUpIcon, ArrowDownIcon } from '@chakra-ui/icons';
 import * as yup from 'yup';
 
 const schema = yup.object().shape({
-  CourseName: yup.string().required('lesson name is required'),
-  NumLects: yup.string().required('lesson style is required'),
-
+  NumLects: yup.string().required('Number of lectures is required'),
 });
 
 type LessonData = {
@@ -50,42 +46,77 @@ type LessonData = {
 const CourseCreate = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [lessonData, setLessonData] = useState<LessonData>({});
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [inputType, setInputType] = useState('pdf'); // State to handle the selected input type
+  const [requiredSkills, setRequiredSkills] = useState<string[]>([]);
+  const [selectedSkill, setSelectedSkill] = useState<string>('');
   const [courseTopics, setCourseTopics] = useState('');
 
   const { register, handleSubmit, formState: { errors }, getValues } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      CourseName: '',
       NumLects: '',
     },
   });
 
+  useEffect(() => {
+    const fetchRequiredSkills = async () => {
+      const programId = localStorage.getItem('program_id');
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setPdfFile(e.target.files[0]);
-    }
-  };
+      if (!programId) {
+        toast({
+          title: 'Error',
+          description: 'Program ID not found in local storage.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      try {
+        const response = await axios.get('/api/company/get-program-info', {
+          params: { program_id: programId },
+        });
+        setRequiredSkills(response.data.required_skills || []);
+      } catch (error) {
+        toast({
+          title: 'Error fetching required skills',
+          description: 'Failed to fetch required skills for the program.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    };
+
+    fetchRequiredSkills();
+  }, [toast]);
 
   const onSubmit = async (data: { [key: string]: any }) => {
-    const formData = new FormData();
-    formData.append('course_name', data.CourseName);
-    formData.append('num_lectures', data.NumLects);
-
-
-    if (pdfFile) {
-      formData.append('syllabus', pdfFile);
+    const programId = localStorage.getItem('program_id');
+    if (!programId) {
+      toast({
+        title: 'Error',
+        description: 'Program ID not found in local storage.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     }
+
+    const formData = new FormData();
+    formData.append('program_id', programId);
+    formData.append('required_skill', selectedSkill);
+    formData.append('num_lectures', data.NumLects);
+    formData.append('course_topics', courseTopics);
 
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/company/generate-lesson', formData, {
+      const response = await axios.post('/api/company/generate-course', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -117,16 +148,20 @@ const CourseCreate = () => {
   const handleSaveChanges = async () => {
     try {
       const formData = new FormData();
+      const programId = localStorage.getItem('program_id');
+      if (!programId) return;
+
       const values = getValues();
-      formData.append('course_name', values.CourseName);
+      formData.append('program_id', programId);
+      formData.append('required_skill', selectedSkill);
       formData.append('num_lectures', values.NumLects);
       formData.append('lessons', JSON.stringify(lessonData));
+
       const response = await axios.post('/api/company/create-course', formData);
       localStorage.setItem('course_name', response.data.course_name);
       localStorage.setItem('course_id', response.data.course_id);
 
       if (response.status === 200) {
-
         toast({
           title: 'Lessons and Course saved successfully!',
           status: 'success',
@@ -166,7 +201,6 @@ const CourseCreate = () => {
     setLessonData(Object.fromEntries(entries));
   };
 
-
   return (
     <>
       {loading ? (
@@ -181,85 +215,70 @@ const CourseCreate = () => {
         </>
       ) : (
         <>
-          <Box bg="purple.200" minHeight={'100vh'} minWidth={'100vw'}>
+          <Box bg="purple.200" minHeight="100vh" minWidth="100vw">
             <Navbar />
             <Box display="flex" alignItems="center" justifyContent="center" p={10}>
               <Box maxWidth="5xl" bg="white" width="40%" p={10} borderWidth={1} borderRadius="xl" boxShadow="lg">
                 <Center>
-                  <Text className='main-heading' fontSize={"5xl"} color={"purple.600"}>
+                  <Text className="main-heading" fontSize="5xl" color="purple.600">
                     <b>Generate Course</b>
                   </Text>
                 </Center>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                  <FormControl mb={"5"} mt={5} isInvalid={!!errors.CourseName} isRequired>
-                    <FormLabel className='feature-heading' letterSpacing={2}><b>Course Name:</b></FormLabel>
-                    <Input
-                      placeholder="Enter the course name"
-                      {...register('CourseName')}
-                      borderColor={'purple.600'}
-                      _hover={{ borderColor: "purple.600" }}
-                    />
-                    <FormErrorMessage>{errors.CourseName?.message}</FormErrorMessage>
+                  <FormControl mb="5" isRequired>
+                    <FormLabel className="feature-heading" letterSpacing={2}>
+                      <b>Required Skills:</b>
+                    </FormLabel>
+                    <Select
+                      placeholder="Select a skill"
+                      value={selectedSkill}
+                      onChange={(e) => setSelectedSkill(e.target.value)}
+                      borderColor="purple.600"
+                      _hover={{ borderColor: 'purple.600' }}
+                    >
+                      {requiredSkills.map((skill, index) => (
+                        <option key={index} value={skill}>
+                          {skill}
+                        </option>
+                      ))}
+                    </Select>
                   </FormControl>
 
-                  <FormControl mb={"5"} isInvalid={!!errors.NumLects} isRequired>
-                    <FormLabel className='feature-heading' letterSpacing={2}><b>Minimum Number of Lectures:</b></FormLabel>
+                  <FormControl mb="5" isInvalid={!!errors.NumLects} isRequired>
+                    <FormLabel className="feature-heading" letterSpacing={2}>
+                      <b>Minimum Number of Lectures:</b>
+                    </FormLabel>
                     <Input
-                      placeholder="Describe the lesson"
+                      placeholder="Enter the number of lectures"
                       {...register('NumLects')}
-                      borderColor={'purple.600'}
-                      _hover={{ borderColor: "purple.600" }}
+                      borderColor="purple.600"
+                      _hover={{ borderColor: 'purple.600' }}
                     />
                     <FormErrorMessage>{errors.NumLects?.message}</FormErrorMessage>
                   </FormControl>
-                  <FormControl mb={"5"} isRequired>
-                    <FormLabel className='feature-heading' letterSpacing={2}>
-                      <b>Syllabus:</b>
-                    </FormLabel>
-                    <RadioGroup onChange={setInputType} value={inputType}>
-                      <Stack direction="row" spacing={5}>
-                        <Radio value="pdf" colorScheme="purple">
-                          PDF
-                        </Radio>
-                        <Radio value="text" colorScheme="purple">
-                          Text
-                        </Radio>
-                      </Stack>
-                    </RadioGroup>
-                  </FormControl>
-                  {inputType === 'pdf' && (
-                    <FormControl mb={"5"} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}>
-                        <b>Upload Course Syllabus PDFs</b>
-                      </FormLabel>
-                      <Input
-                        type="file"
-                        borderColor={'purple.600'}
-                        p={1}
-                        multiple={true}
-                        _hover={{ borderColor: "purple.600" }}
-                        accept=".pdf"
-                        onChange={handleFileChange}
-                      />
-                    </FormControl>
-                  )}
 
-                  {inputType === 'text' && (
-                    <FormControl mb={"5"} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}>
-                        <b>Enter Course Topics</b>
-                      </FormLabel>
-                      <Textarea
-                        placeholder="Start typing..."
-                        value={courseTopics}
-                        onChange={(e) => setCourseTopics(e.target.value)}
-                        borderColor={'purple.600'}
-                        _hover={{ borderColor: "purple.600" }}
-                      />
-                    </FormControl>
-                  )}
-                  <Button colorScheme="purple" _hover={{ bg: useColorModeValue('purple.600', 'purple.800'), color: useColorModeValue('white', 'white') }} variant="outline" type="submit" width="full" mt={4}>
-                    Generate Base lesson
+                  <FormControl mb="5" isRequired>
+                    <FormLabel className="feature-heading" letterSpacing={2}>
+                      <b>Enter Course Topics</b>
+                    </FormLabel>
+                    <Textarea
+                      placeholder="Start typing..."
+                      value={courseTopics}
+                      onChange={(e) => setCourseTopics(e.target.value)}
+                      borderColor="purple.600"
+                      _hover={{ borderColor: 'purple.600' }}
+                    />
+                  </FormControl>
+
+                  <Button
+                    colorScheme="purple"
+                    _hover={{ bg: useColorModeValue('purple.600', 'purple.800'), color: useColorModeValue('white', 'white') }}
+                    variant="outline"
+                    type="submit"
+                    width="full"
+                    mt={4}
+                  >
+                    Generate Base Lesson
                   </Button>
                 </form>
               </Box>
@@ -267,7 +286,7 @@ const CourseCreate = () => {
           </Box>
           <Modal isOpen={isOpen} onClose={onClose} size="3xl">
             <ModalOverlay />
-            <ModalContent height={"90vh"} overflow={"scroll"}>
+            <ModalContent height="90vh" overflow="scroll">
               <ModalHeader>Edit Lessons</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
@@ -281,7 +300,6 @@ const CourseCreate = () => {
                           </Text>
                           <Input
                             value={lesson}
-
                             onChange={(e) => handleEdit(e.target.value, description)}
                             placeholder="Lesson Name"
                           />
@@ -319,11 +337,10 @@ const CourseCreate = () => {
               </ModalFooter>
             </ModalContent>
           </Modal>
-
         </>
       )}
     </>
   );
-}
+};
 
 export default CourseCreate;

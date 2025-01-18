@@ -65,7 +65,7 @@ const Login = () => {
           
         }else{
           sessionStorage.setItem('teacher_authenticated', 'true');          
-          navigate('/company/dashboard');
+          navigate('/company/training-programs');
         }
         
       } else {

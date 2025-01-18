@@ -143,6 +143,13 @@ class ServerUtils:
             course_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
             if course_collection.find_one({"course_code": course_code}) is None:
                 return course_code
+    
+    @staticmethod
+    def generate_program_code(train_program_collection, length=6):
+        while True:
+            program_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+            if train_program_collection.find_one({"program_code": program_code}) is None:
+                return program_code
 
 # class AssistantUtils:
 #     @staticmethod

@@ -19,7 +19,7 @@ import CoursePage from "./pages/company/course/course";
 import LabManual from "./pages/company/course/Lab Manual/LabManual";
 import LabManualCreate from "./pages/company/course/Lab Manual/LabManualCreate";
 import LessonsGrid from "./pages/company/scheduler";
-import TrainingProgram from "./pages/company/TrainingProgram";
+import TrainingDashboard from "./pages/company/TrainingDashboard";
 
 function App() {
   return (
@@ -36,10 +36,10 @@ function App() {
       <Route element={<AssessmentPage />} path="/student/assessment" />
       <Route element={<Dashboard />} path="/student/dashboard" />
       <Route element={<JobRoles />} path="/student/job-roles" />
-      <Route element={<TrainingProgram />} path="/company/training-program" />
       <Route element={<TeacherDashboard />} path="/company/dashboard" />
-      <Route element={<CourseCreate />} path="/company/create-course2" />
-      <Route element={<LessonCreate />} path="/company/create-course" />
+      <Route element={<TrainingDashboard />} path="/company/training-programs" />
+      <Route element={<CourseCreate />} path="/company/create-course" />
+      <Route element={<LessonCreate />} path="/company/create-lesson" />
       <Route element={<CoursePage />} path="/company/course" />
       <Route element={<LabManual />} path="/company/lab-manual" />
       <Route element={<LabManualCreate />} path="/company/lab-manual-create" />

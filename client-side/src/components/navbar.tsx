@@ -96,7 +96,7 @@ export const Navbar = () => {
                         <Box display={"flex"}  >
                             <Logo color='white' />
                             <Box mt={2} className="roboto-regular-italic" fontSize={'lg'} color="white">
-                                Solo Leveling
+                                Aspire AI
                             </Box>
                         </Box>
                     </HStack>
@@ -105,27 +105,12 @@ export const Navbar = () => {
                 <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }} ml="auto">
                     {teacherAuthenticated && (
                         <>
-                            <NavLink href="/company/dashboard">
+                            <NavLink href="/company/training-programs">
                                 <HStack spacing={2}>
                                     <FaHome size={24} />
                                     <span>Home</span>
                                 </HStack>
                             </NavLink>
-
-                            <NavLink href="/company/create-course">
-                                <HStack spacing={2}>
-                                    <MdCreateNewFolder size={24} />
-                                    <span>Create Course</span>
-                                </HStack>
-                            </NavLink>
-
-                            <NavLink href="/company/training-program">
-                                <HStack spacing={2}>
-                                    <MdCreateNewFolder size={24} />
-                                    <span>Create Training Program</span>
-                                </HStack>
-                            </NavLink>
-
                             <Box
                                 px={2}
                                 py={1}

@@ -237,7 +237,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         <Collapse in={activeTabIndex === 0} transition={{ enter: { duration: 0.1 }, exit: { duration: 0.1 } }}>
                             <TabPanel width={["80px", "200px", "350px"]}>
                                 <Heading as="h3" size="md" textAlign="center" mb={4}>
-                                    Lessons
+                                    Sub Modules
                                 </Heading>
                                 <VStack spacing={2} align="stretch">
                                     {submoduleKeys.map((submodule, index) => (
