@@ -110,7 +110,7 @@ const Login = () => {
           <Tabs isFitted variant='soft-rounded' colorScheme='purple' onChange={(index) => setActiveTab(index)}>
             <TabList>
               <Tab>Student</Tab>
-              <Tab>Teacher</Tab>
+              <Tab>Company</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>

@@ -15,7 +15,7 @@ import {
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { FaHome, FaSignInAlt, FaUserPlus} from 'react-icons/fa';
 import { MdCreateNewFolder, MdLogout } from "react-icons/md";
-import { PiStudent } from "react-icons/pi";
+import { PiStudent, PiChalkboardTeacherFill } from "react-icons/pi";
 import { GiTeacher } from "react-icons/gi";
 import { Logo } from './icons';
 import { useNavigate } from 'react-router-dom';
@@ -96,7 +96,7 @@ export const Navbar = () => {
                         <Box display={"flex"}  >
                             <Logo color='white' />
                             <Box mt={2} className="roboto-regular-italic" fontSize={'lg'} color="white">
-                                Solo Leveling
+                                Aspire AI
                             </Box>
                         </Box>
                     </HStack>
@@ -116,6 +116,13 @@ export const Navbar = () => {
                                 <HStack spacing={2}>
                                     <MdCreateNewFolder size={24} />
                                     <span>Create Course</span>
+                                </HStack>
+                            </NavLink>
+
+                            <NavLink href="/teacher/training-program">
+                                <HStack spacing={2}>
+                                    <PiChalkboardTeacherFill size={24} />
+                                    <span>Training Program</span>
                                 </HStack>
                             </NavLink>
 
@@ -184,7 +191,7 @@ export const Navbar = () => {
                                     </MenuItem>
                                     <MenuItem onClick={() => navigate("/register/teacher")}>
                                     <GiTeacher size={20} style={{ marginRight: 8 }} />
-                                        <span>Teacher Registration</span>
+                                        <span>Company Registration</span>
                                     </MenuItem>
                                 </MenuList>
                             </Menu>
@@ -227,7 +234,7 @@ export const Navbar = () => {
                                     <span>Student Registration</span>
                                 </MenuItem>
                                 <MenuItem onClick={() => navigate("/register/teacher")}>
-                                    <span>Teacher Registration</span>
+                                    <span>Company Registration</span>
                                 </MenuItem>
                             </MenuList>
                         </Menu>

@@ -19,7 +19,7 @@ import CoursePage from "./pages/teacher/course/course";
 import LabManual from "./pages/teacher/course/Lab Manual/LabManual";
 import LabManualCreate from "./pages/teacher/course/Lab Manual/LabManualCreate";
 import LessonsGrid from "./pages/teacher/scheduler";
-
+import TrainingProgram from "./pages/teacher/TrainingProgram";
 
 function App() {
   return (
@@ -39,15 +39,13 @@ function App() {
 
       <Route element={<TeacherDashboard />} path="/teacher/dashboard" />
       <Route element={<CourseCreate />} path="/teacher/create-course" />
+      <Route element={<TrainingProgram />} path="/teacher/training-program" />
       <Route element={<LessonCreate />} path="/teacher/create-lesson" />
       <Route element={<CoursePage />} path="/teacher/course" />
       <Route element={<LabManual />} path="/teacher/lab-manual" />
       <Route element={<LabManualCreate />} path="/teacher/lab-manual-create" />
       <Route element={<LessonsGrid />} path="/teacher/scheduler" />
 
-      
-
-      
       {/* <Route element={<Home />} path="/student/home" /> */}
     </Routes>
   );
