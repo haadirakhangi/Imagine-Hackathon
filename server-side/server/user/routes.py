@@ -367,11 +367,42 @@ def user_dashboard():
 
         student_id = session.get("student_id")
         user_data : dict = std_profile_coll.find_one({"_id": ObjectId(student_id)})
-        required_skills = session['required_skills']
-        online_courses = SERPER_CLIENT.find_courses(required_skills)
         if not user_data:
             return jsonify({"error": "User not found"}), 404
-        print(online_courses)
+        
+        technical_assessment = user_data.get("technical_assessment", {})
+        knowledge_scores :dict = technical_assessment.get("knowledgeScores", {})
+        job_role = user_data.get('dream_job')
+        students_current_skills = {}
+        for field, scores in knowledge_scores.items():
+            score = scores.get("score", 0)
+            max_score = scores.get("maxScore", 1)  # Avoid division by zero
+            normalized_score = (score / max_score) * 10
+            students_current_skills[field]=normalized_score
+        existing_job_role_data = job_roles.find_one({"student_id": student_id, "job_role": job_role})
+        if existing_job_role_data:
+            session['required_skills'] = existing_job_role_data["required_skills"]
+            return jsonify({
+                "required_skills": existing_job_role_data["required_skills"],
+                "skill_gap_analysis": existing_job_role_data["skill_gap_analysis"]
+            }), 200
+        required_skills = SKILLS_ANALYZER.fetch_extract_demand_skills(job_role)
+        skill_gap_analysis = SKILLS_ANALYZER.analyze_skill_gap(job_role, students_current_skills, required_skills)
+        job_role_data = {
+            "student_id": student_id,
+            "job_role": job_role,
+            "required_skills": required_skills,
+            "skill_gap_analysis": skill_gap_analysis
+        }
+        job_roles.insert_one(job_role_data)
+        session['required_skills'] = required_skills
+        # return jsonify({
+        #     "required_skills": required_skills,
+        #     "skill_gap_analysis": skill_gap_analysis
+        # }), 200
+        required_skills = session['required_skills']
+        online_courses = SERPER_CLIENT.find_courses(required_skills)
+        
         # Prepare the dashboard data
         dashboard_data = {
             "full_name": user_data.get("full_name", ""),
@@ -393,6 +424,7 @@ def user_dashboard():
             "soft_skill_assessment": user_data.get("soft_skill_assessment", {}),
             "required_skills": required_skills,
             "online_courses": online_courses,
+            "skill_gap_analysis": skill_gap_analysis
         }
 
         return jsonify({'user_data' : dashboard_data}), 200
