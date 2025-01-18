@@ -88,33 +88,33 @@ def create_course():
     if company_id is None:
         return jsonify({"message": "company not logged in", "response": False}), 401
 
-    try:
-        course_name = request.form['course_name']
-        num_lectures = request.form['num_lectures']
-        lessons = request.form['lessons']
-        course_code = ServerUtils.generate_course_code(courses_collection, length=6)
+    # try:
+    course_name = request.form['required_skill']
+    num_lectures = request.form['num_lectures']
+    lessons = request.form['lessons']
+    course_code = ServerUtils.generate_course_code(courses_collection, length=6)
 
-        new_course = {
-            "course_name": course_name,
-            "num_of_lectures": num_lectures,
-            "company_id": company_id,
-            "lessons_data": lessons,
-            "course_code": course_code,
-        }
+    new_course = {
+        "course_name": course_name,
+        "num_of_lectures": num_lectures,
+        "company_id": company_id,
+        "lessons_data": lessons,
+        "course_code": course_code,
+    }
 
-        result = courses_collection.insert_one(new_course)
+    result = courses_collection.insert_one(new_course)
 
-        session['course_id'] = str(result.inserted_id) 
-        session['lessons'] = lessons
+    session['course_id'] = str(result.inserted_id) 
+    session['lessons'] = lessons
 
-        return jsonify({
-            'message': 'Course and lessons created successfully',
-            "course_name": course_name,
-            "course_id": str(result.inserted_id)
-        }), 200
+    return jsonify({
+        'message': 'Course and lessons created successfully',
+        "course_name": course_name,
+        "course_id": str(result.inserted_id)
+    }), 200
 
-    except Exception as e:
-        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+    # except Exception as e:
+    #     return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
       
 @company.route('/get-courses', methods=['GET'])
 def get_courses():
@@ -506,23 +506,8 @@ async def generate_course():
 
     num_lectures = request.form.get('num_lectures', None)
     course_name = request.form.get('course_name', None) 
-    file = request.files.get('syllabus', None)
-    current_dir = os.path.dirname(__file__)
-    uploads_path = os.path.join(current_dir, 'uploaded-documents', 'syllabus')
-    if not os.path.exists(uploads_path):
-        os.makedirs(uploads_path)
-    if file:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(uploads_path, filename))
-
-    simple_rag = SimpleRAG(
-        course_name=course_name,
-        syllabus_directory_path=uploads_path,
-        embeddings=EMBEDDINGS,
-    )
-    await simple_rag.create_text_vectorstore()
-    relevant_text = await simple_rag.search_similar_text(query=course_name, k=10)
-    output = LESSON_PLANNER.generate_lesson_plan(course_name=course_name, context=relevant_text, num_lectures=num_lectures)
+    course_topics = request.form.get('course_topics', None)
+    output = LESSON_PLANNER.generate_lesson_plan(course_name=course_name, context=course_topics, num_lectures=num_lectures)
     return jsonify({"message": "Query successful", "lessons": output, "response": True}), 200
 
 @company.route('/generate-training-program', methods=['POST'])
@@ -553,13 +538,13 @@ async def generate_training_program():
 
 @company.route('/new-training-program', methods=['POST'])
 @cross_origin(supports_credentials=True)
-async def new_training_program():
+def new_training_program():
     company_id = session.get('company_id')
     if company_id is None:
         return jsonify({"message": "company not logged in", "response": False}), 401
 
     data : dict = request.get_json()
-    job_role = data.get('jobRoles')
+    job_role = data.get('jobRole')
     job_description = data.get('jobDescription')
     required_skills =  data.get('requiredSkills')
 
@@ -578,7 +563,7 @@ async def new_training_program():
 
 @company.route('/get-training-program', methods=['GET'])
 @cross_origin(supports_credentials=True)
-async def get_training_program():
+def get_training_program():
     company_id = session.get('company_id')
     if company_id is None:
         return jsonify({"message": "company not logged in.", "response": False}), 401
@@ -597,7 +582,43 @@ async def get_training_program():
     ]
     return jsonify({"programs": data, "response": True}), 200
 
+@company.route('/get-program-info', methods=['GET'])
+def get_program_info():
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in.", "response": False}), 401
+    program_id = request.args.get('program_id')
+    
+    if not program_id:
+        return jsonify({
+            "status": "error",
+            "message": "Program ID is required."
+        }), 400
 
+    try:
+        # Assuming 'programs' is the collection storing program data
+        program = train_program_collection.find_one({"_id": ObjectId(program_id)})
+        
+        if not program:
+            return jsonify({
+                "status": "error",
+                "message": "Program not found."
+            }), 404
+
+        # Assuming required skills are stored in the 'required_skills' field
+        required_skills = program.get("required_skills", [])
+
+        return jsonify({
+            "status": "success",
+            "required_skills": required_skills
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": "An error occurred while fetching program info.",
+            "error": str(e)
+        }), 500
 
 
 @company.route('/logout', methods=['GET'])

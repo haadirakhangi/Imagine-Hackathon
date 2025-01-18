@@ -9,117 +9,75 @@ import {
   Flex,
   Spinner,
   IconButton,
+  Switch,
   useColorModeValue,
   useToast,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
 } from '@chakra-ui/react';
 import { Navbar } from '../../components/navbar';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DeleteIcon } from '@chakra-ui/icons';
 
-type TrainingProgram = {
+type Course = {
   id: string;
-  program_name: string;
-  description: string;
-  program_code: string;
-  job_description: string;
+  course_name: string;
+  num_of_lectures: number;
+  course_code: string;
+  lessons_data: any;
 };
 
 const TeacherDashboard = () => {
-  const [trainingPrograms, setTrainingPrograms] = useState<TrainingProgram[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [jobRole, setJobRole] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
-  const [requiredSkills, setRequiredSkills] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTrainingPrograms = async () => {
+    const fetchCourses = async () => {
       try {
-        const response = await axios.get('/api/company/get-training-programs');
-        setTrainingPrograms(response.data.programs);
+        const response = await axios.get('/api/company/get-courses');
+        setCourses(response.data.courses);
       } catch (error) {
-        console.error('Error fetching training programs:', error);
+        console.error('Error fetching courses:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTrainingPrograms();
+    fetchCourses();
   }, []);
 
-  const handleViewSessions = (program: TrainingProgram) => {
-    localStorage.setItem('program_name', program.program_name);
-    localStorage.setItem('program_id', program.id);
+  const handleViewLessons = (course: Course) => {
+    localStorage.setItem('course_name', course.course_name);
+    localStorage.setItem('course_id', course.id);
     navigate('/company/scheduler');
   };
 
-  const handleCopyProgramCode = (programCode: string) => {
-    navigator.clipboard.writeText(programCode).then(() => {
+  const handleCopyCourseCode = (courseCode: string) => {
+    navigator.clipboard.writeText(courseCode).then(() => {
       toast({
-        title: 'Program Code Copied!',
-        description: `Program code ${programCode} has been copied to clipboard.`,
-        status: 'success',
+        title: "Course Code Copied!",
+        description: `Course code ${courseCode} has been copied to clipboard.`,
+        status: "success",
         duration: 3000,
         isClosable: true,
       });
     }).catch((error) => {
       toast({
-        title: 'Failed to Copy',
-        description: 'An error occurred while copying the program code.',
-        status: 'error',
+        title: "Failed to Copy",
+        description: "An error occurred while copying the course code.",
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
     });
   };
 
-  const handleCreateProgram = async () => {
-    try {
-      const response = await axios.post('/company/new-training-program', {
-        jobRole,
-        jobDescription,
-        requiredSkills,
-      });
-      toast({
-        title: 'Training Program Created!',
-        description: 'Your training program has been successfully created.',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
-      setTrainingPrograms((prev) => [...prev, response.data.newProgram]);
-      setIsModalOpen(false);
-      setJobRole('');
-      setJobDescription('');
-      setRequiredSkills('');
-    } catch (error) {
-      toast({
-        title: 'Failed to Create Program',
-        description: 'An error occurred while creating the training program.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
-
   if (loading) {
     return (
       <Flex justify="center" align="center" height="90vh">
         <Spinner size="xl" color="purple.500" />
-        <Heading ml={4}>Fetching Training Programs...</Heading>
+        <Heading ml={4}>Fetching Courses...</Heading>
       </Flex>
     );
   }
@@ -130,24 +88,27 @@ const TeacherDashboard = () => {
       <Box p={5} position="relative">
         <Flex justify="space-between" alignItems="center" mb={6}>
           <Heading textAlign="center" color="purple.600">
-            My Training Programs
+            My Courses
           </Heading>
-          <Button colorScheme="purple" onClick={() => setIsModalOpen(true)}>
-            Create New Training Program
+          <Button colorScheme="purple" onClick={() => navigate('/company/create-course')}>
+            Create New Course
           </Button>
         </Flex>
-
-        {trainingPrograms.length === 0 ? (
+  
+        {courses.length === 0 ? (
           <Flex justify="center" align="center" height="50vh">
             <Heading color="gray.500" size="lg">
-              No training programs created yet.
+              No courses generated yet.
             </Heading>
           </Flex>
         ) : (
-          <Grid gap={6} templateColumns="repeat(auto-fit, minmax(250px, 0.2fr))">
-            {trainingPrograms.map((program) => (
+          <Grid
+            gap={6}
+            templateColumns="repeat(auto-fit, minmax(250px, 0.2fr))"
+          >
+            {courses.map((course) => (
               <Box
-                key={program.id}
+                key={course.id}
                 position="relative"
                 p={5}
                 borderWidth="1px"
@@ -159,34 +120,44 @@ const TeacherDashboard = () => {
               >
                 <Flex justifyContent="space-between" alignItems="center" mb={4}>
                   <IconButton
-                    aria-label="Delete Program"
+                    aria-label="Delete Course"
                     icon={<DeleteIcon />}
                     size="sm"
                     colorScheme="red"
-                    // onClick={() => handleDeleteProgram(program.id)}
+                    // onClick={() => handleDeleteCourse(course.id)}
                   />
+                  <Flex alignItems="center">
+                    <Text fontSize="sm" mr={2}>
+                      Private
+                    </Text>
+                    <Switch
+                      colorScheme="purple"
+                      // onChange={() => handlePrivacyToggle(course.id)}
+                      // isChecked={course.isPublic}
+                    />
+                    <Text fontSize="sm" ml={2}>
+                      Public
+                    </Text>
+                  </Flex>
                 </Flex>
                 <VStack align="start" spacing={3} flex="1">
                   <Text fontWeight="bold" fontSize="lg" color="purple.500">
-                    {program.program_name}
+                    {course.course_name}
                   </Text>
                   <Text fontSize="sm">
-                    Program Code:{" "}
+                    Course Code:{" "}
                     <Text
                       as="span"
                       fontWeight="bold"
                       color="purple.600"
                       cursor="pointer"
-                      onClick={() => handleCopyProgramCode(program.program_code)}
+                      onClick={() => handleCopyCourseCode(course.course_code)}
                     >
-                      {program.program_code}
+                      {course.course_code}
                     </Text>
                   </Text>
-                  <Text fontSize="sm" noOfLines={3}>
-                    <b>Description:</b> {program.description}
-                  </Text>
-                  <Text fontSize="sm" noOfLines={3}>
-                    <b>Job Description:</b> {program.job_description}
+                  <Text fontSize="sm">
+                    Number of Lectures: {course.num_of_lectures}
                   </Text>
                 </VStack>
                 <Button
@@ -196,53 +167,18 @@ const TeacherDashboard = () => {
                   color="white"
                   _hover={{ bg: "purple.500" }}
                   mt={3}
-                  onClick={() => handleViewSessions(program)}
+                  onClick={() => handleViewLessons(course)}
                 >
-                  View Details
+                  View Lessons
                 </Button>
               </Box>
             ))}
           </Grid>
         )}
-
-        {/* Modal for creating new training program */}
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Create New Training Program</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              <VStack spacing={4}>
-                <Input
-                  placeholder="Job Role"
-                  value={jobRole}
-                  onChange={(e) => setJobRole(e.target.value)}
-                />
-                <Textarea
-                  placeholder="Job Description"
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                />
-                <Input
-                  placeholder="Required Skills (comma-separated)"
-                  value={requiredSkills}
-                  onChange={(e) => setRequiredSkills(e.target.value)}
-                />
-              </VStack>
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="purple" onClick={handleCreateProgram}>
-                Create
-              </Button>
-              <Button variant="ghost" onClick={() => setIsModalOpen(false)} ml={3}>
-                Cancel
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
       </Box>
     </div>
   );
+  
 };
 
 export default TeacherDashboard;

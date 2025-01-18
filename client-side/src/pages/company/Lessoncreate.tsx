@@ -32,11 +32,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 const schema = yup.object().shape({
-  course_description: yup.string().required('Course Description is required'),
+  lessonStyle: yup.string().required('lesson style is required'),
+  lessonType: yup.string().required('lesson type is required'),
   links: yup.array().of(yup.string().url('Invalid URL')),
-  skill_name: yup.string().required('Skill name is required'),
-  course_type: yup.string().required('Course type is required'),
-  skill_area: yup.string().required('Skill area is required'),
 });
 
 const LessonCreate = () => {
@@ -49,15 +47,15 @@ const LessonCreate = () => {
   const [submodules, setSubmodules] = useState<Record<string, string>>({});
   const [links, setLinks] = useState<string[]>([]);
   const [webSearch, setWebSearch] = useState<boolean>(false);
+  const course_name = localStorage.getItem('course_name');
+  const lesson_name = localStorage.getItem('lesson_name');
   const lessonNameInputRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      course_description: '',
-      course_type: '',
-      skill_name: '',
-      skill_area: '',
+      lessonStyle: '',
+      lessonType: '',
       links: [],
     },
   });
@@ -90,10 +88,10 @@ const LessonCreate = () => {
 
   const onSubmit = async (data: { [key: string]: any }) => {
     const formData = new FormData();
-    formData.append('skill_area', data.skill_area || '');
-    formData.append('skill_name', data.skill_name || '');
-    formData.append('course_description', data.course_description);
-    formData.append('course_type', data.course_type);
+    formData.append('lesson_name', lesson_name || '');
+    formData.append('course_name', course_name || '');
+    formData.append('description', data.lessonStyle);
+    formData.append('lessonType', data.lessonType);
     formData.append('links', JSON.stringify(links));
     formData.append('includeImages', includeImages.toString());
     if(webSearch!= null){
@@ -181,53 +179,42 @@ const LessonCreate = () => {
             <Box maxWidth="5xl" bg="white" width="100%" p={10} borderWidth={1} borderRadius="xl" boxShadow="lg">
               <Center>
                 <Text className='main-heading' fontSize={"5xl"} color={"purple.600"}>
-                  <b>Generate Course</b>
+                  <b>Generate Lesson</b>
+                </Text>
+              </Center>
+              <Center>
+                <Text className='feature-heading' fontSize={"4xl"} mb={4}>
+                  <b>Course name:</b> {course_name}
                 </Text>
               </Center>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Flex direction={['column', 'row']} justify="space-between" gap={6}>
                   {/* Left Section */}
                   <VStack width={['full', '45%']} spacing={6} align="stretch">
-
-                  <FormControl isInvalid={!!errors.skill_area} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Skill Area:</b></FormLabel>
-                      <Input
-                        placeholder="Ex. Programming Language"
-                        {...register('skill_area')}
-                        ref={lessonNameInputRef}
-                        borderColor={'purple.600'}
-                        _hover={{ borderColor: "purple.600" }}/>
-                    </FormControl>
+                    <Box>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Lesson Name:</b></FormLabel>
+                      <Text borderColor={"purple.400"} borderRadius={10} borderWidth={2} p={2} className='content' fontSize={"lg"}>
+                        {lesson_name}
+                      </Text>
+                    </Box>
 
 
-
-                    <FormControl isInvalid={!!errors.skill_name} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Skill Name:</b></FormLabel>
-                      <Input
-                        placeholder="Ex. Python"
-                        {...register('skill_name')}
-                        ref={lessonNameInputRef}
-                        borderColor={'purple.600'}
-                        _hover={{ borderColor: "purple.600" }}/>
-                    </FormControl>
-
-
-                    <FormControl isInvalid={!!errors.course_description} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Course Description</b></FormLabel>
+                    <FormControl isInvalid={!!errors.lessonStyle} isRequired>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Lesson Style</b></FormLabel>
                       <Input
                         placeholder="Describe the lesson"
-                        {...register('course_description')}
+                        {...register('lessonStyle')}
                         borderColor={'purple.600'}
                         _hover={{ borderColor: "purple.600" }}
                       />
-                      <FormErrorMessage>{errors.course_description?.message}</FormErrorMessage>
+                      <FormErrorMessage>{errors.lessonStyle?.message}</FormErrorMessage>
                     </FormControl>
 
-                    <FormControl isInvalid={!!errors.course_type} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Course Type</b></FormLabel>
+                    <FormControl isInvalid={!!errors.lessonType} isRequired>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Lesson Type</b></FormLabel>
                       <Select
                         placeholder="Select lesson type"
-                        {...register('course_type')}
+                        {...register('lessonType')}
                         borderColor={'purple.600'}
                         _hover={{ borderColor: "purple.600" }}
                       >
@@ -235,14 +222,14 @@ const LessonCreate = () => {
                         <option value="mathematical">Mathematical</option>
                         <option value="practical">Practical</option>
                       </Select>
-                      <FormErrorMessage>{errors.course_type?.message}</FormErrorMessage>
+                      <FormErrorMessage>{errors.lessonType?.message}</FormErrorMessage>
                     </FormControl>
                   </VStack>
 
                   {/* Right Section */}
                   <VStack width={['full', '45%']} spacing={6} align="stretch">
                     <FormControl>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Upload Course Related PDFs</b></FormLabel>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Upload Lesson Related PDFs</b></FormLabel>
                       <Input
                         type="file"
                         borderColor={'purple.600'}
@@ -327,7 +314,7 @@ const LessonCreate = () => {
                   </VStack>
                 </Flex>
                 <Button colorScheme="purple" _hover={{ bg: useColorModeValue('purple.600', 'purple.800'), color: useColorModeValue('white', 'white') }} variant="outline" type="submit" width="full" mt={4}>
-                  Generate Base Course
+                  Generate Base lesson
                 </Button>
               </form>
             </Box>
