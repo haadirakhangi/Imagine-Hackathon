@@ -36,7 +36,7 @@ load_dotenv()
 
 students = Blueprint(name='students', import_name=__name__, url_prefix="/student")
 password = quote_plus(os.getenv("MONGO_PASS"))
-uri = "mongodb+srv://rachit:" + password +"@cluster0.xjqiw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+uri = "mongodb+srv://mongouser:" + password +"@cluster0.rcrwl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(uri, server_api=ServerApi('1'))
 
 student_data = client["student_data"]
