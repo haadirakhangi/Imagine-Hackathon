@@ -179,7 +179,7 @@ const LessonCreate = () => {
             <Box maxWidth="5xl" bg="white" width="100%" p={10} borderWidth={1} borderRadius="xl" boxShadow="lg">
               <Center>
                 <Text className='main-heading' fontSize={"5xl"} color={"purple.600"}>
-                  <b>Generate Lesson</b>
+                  <b>Generate Modules</b>
                 </Text>
               </Center>
               <Center>
@@ -192,7 +192,7 @@ const LessonCreate = () => {
                   {/* Left Section */}
                   <VStack width={['full', '45%']} spacing={6} align="stretch">
                     <Box>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Lesson Name:</b></FormLabel>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Modules Name:</b></FormLabel>
                       <Text borderColor={"purple.400"} borderRadius={10} borderWidth={2} p={2} className='content' fontSize={"lg"}>
                         {lesson_name}
                       </Text>
@@ -200,9 +200,9 @@ const LessonCreate = () => {
 
 
                     <FormControl isInvalid={!!errors.lessonStyle} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Lesson Style</b></FormLabel>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Modules  Style</b></FormLabel>
                       <Input
-                        placeholder="Describe the lesson"
+                        placeholder="Describe the Modules"
                         {...register('lessonStyle')}
                         borderColor={'purple.600'}
                         _hover={{ borderColor: "purple.600" }}
@@ -211,9 +211,9 @@ const LessonCreate = () => {
                     </FormControl>
 
                     <FormControl isInvalid={!!errors.lessonType} isRequired>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Lesson Type</b></FormLabel>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Modules Type</b></FormLabel>
                       <Select
-                        placeholder="Select lesson type"
+                        placeholder="Select modules type"
                         {...register('lessonType')}
                         borderColor={'purple.600'}
                         _hover={{ borderColor: "purple.600" }}
@@ -229,7 +229,7 @@ const LessonCreate = () => {
                   {/* Right Section */}
                   <VStack width={['full', '45%']} spacing={6} align="stretch">
                     <FormControl>
-                      <FormLabel className='feature-heading' letterSpacing={2}><b>Upload Lesson Related PDFs</b></FormLabel>
+                      <FormLabel className='feature-heading' letterSpacing={2}><b>Upload Modules Related PDFs</b></FormLabel>
                       <Input
                         type="file"
                         borderColor={'purple.600'}
@@ -314,7 +314,7 @@ const LessonCreate = () => {
                   </VStack>
                 </Flex>
                 <Button colorScheme="purple" _hover={{ bg: useColorModeValue('purple.600', 'purple.800'), color: useColorModeValue('white', 'white') }} variant="outline" type="submit" width="full" mt={4}>
-                  Generate Base lesson
+                  Generate Base Module
                 </Button>
               </form>
             </Box>

@@ -93,7 +93,7 @@ class GeminiProvider:
         self.chat = self.gemini_client.chats.create(
             model=self.model,
             config=types.GenerateContentConfig(
-                system_instruction=f"You are ISSAC, a helpful assistant for the website Solo Leveling. Use the functions provided to you to answer user's question about the Solo Leveling platform. User Profile: {profile}",
+                system_instruction=f"You are ISSAC, a helpful assistant for the website Aspire AI. Use the functions provided to you to answer user's question about the Aspire AI platform. User Profile: {profile}",
                 tools=tools,
                 automatic_function_calling=True,
             )

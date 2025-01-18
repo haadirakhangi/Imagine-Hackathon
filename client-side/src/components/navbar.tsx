@@ -96,7 +96,7 @@ export const Navbar = () => {
                         <Box display={"flex"}  >
                             <Logo color='white' />
                             <Box mt={2} className="roboto-regular-italic" fontSize={'lg'} color="white">
-                                Solo Leveling
+                                Aspire AI
                             </Box>
                         </Box>
                     </HStack>
