@@ -510,31 +510,31 @@ async def generate_course():
     output = LESSON_PLANNER.generate_lesson_plan(course_name=course_name, context=course_topics, num_lectures=num_lectures)
     return jsonify({"message": "Query successful", "lessons": output, "response": True}), 200
 
-@company.route('/generate-training-program', methods=['POST'])
-@cross_origin(supports_credentials=True)
-async def generate_training_program():
-    company_id = session.get('company_id')
-    if company_id is None:
-        return jsonify({"message": "company not logged in", "response": False}), 401
+# @company.route('/generate-training-program', methods=['POST'])
+# @cross_origin(supports_credentials=True)
+# async def generate_training_program():
+#     company_id = session.get('company_id')
+#     if company_id is None:
+#         return jsonify({"message": "company not logged in", "response": False}), 401
 
-    job_role : str = request.form.get('job_role')
-    required_skills : dict = request.form.get('required_skills')
-    scenarios : list = request.form.get('scenarios')
-    company_id = session.get('company_id')
-    if company_id is None:
-        return jsonify({"message": "company not logged in", "response": False}), 401
+#     job_role : str = request.form.get('job_role')
+#     required_skills : dict = request.form.get('required_skills')
+#     scenarios : list = request.form.get('scenarios')
+#     company_id = session.get('company_id')
+#     if company_id is None:
+#         return jsonify({"message": "company not logged in", "response": False}), 401
     
-    if 'files[]' not in request.files:
-        files = []
-    else:
-        files = request.files.getlist('files[]')
-    skill_names : list = required_skills['skill_names']
-    links = required_skills.get('links')
-    web_search = required_skills.get('web_search')
-    pdfs = required_skills.get('pdfs')
-    lesson_type = required_skills.get('lesson_type')
+#     if 'files[]' not in request.files:
+#         files = []
+#     else:
+#         files = request.files.getlist('files[]')
+#     skill_names : list = required_skills['skill_names']
+#     links = required_skills.get('links')
+#     web_search = required_skills.get('web_search')
+#     pdfs = required_skills.get('pdfs')
+#     lesson_type = required_skills.get('lesson_type')
 
-    return jsonify({"message": "Query successful","response": True}), 200
+#     return jsonify({"message": "Query successful","response": True}), 200
 
 @company.route('/new-training-program', methods=['POST'])
 @cross_origin(supports_credentials=True)
