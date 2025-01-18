@@ -387,10 +387,29 @@ def user_dashboard():
         existing_job_role_data = job_roles.find_one({"student_id": student_id, "job_role": job_role})
         if existing_job_role_data:
             session['required_skills'] = existing_job_role_data["required_skills"]
-            return jsonify({
-                "required_skills": existing_job_role_data["required_skills"],
-                "skill_gap_analysis": existing_job_role_data["skill_gap_analysis"]
-            }), 200
+            dashboard_data = {
+                "full_name": user_data.get("full_name", ""),
+                "age": user_data.get("age", ""),
+                "location": user_data.get("location", ""),
+                "preferred_language": user_data.get("preferred_language", ""),
+                "email": user_data.get("email", ""),
+                "gender": user_data.get("gender", ""),
+                "highest_education": user_data.get("highest_education", ""),
+                "field_of_study": user_data.get("field_of_study", ""),
+                "dream_job": user_data.get("dream_job", ""),
+                "interests": user_data.get("interests", []),
+                "challenges": user_data.get("challenges", ""),
+                "motivation": user_data.get("motivation", ""),
+                "learning_platforms": user_data.get("learning_platforms", ""),
+                "top_skills": user_data.get("top_skills", []),
+                "resume_id": user_data.get("resume_id", ""),
+                "technical_assessment": user_data.get("technical_assessment", {}),
+                "soft_skill_assessment": user_data.get("soft_skill_assessment", {}),
+                "required_skills": required_skills,
+                "online_courses": online_courses,
+                "skill_gap_analysis": skill_gap_analysis
+            }
+            return jsonify({'user_data' : dashboard_data}), 200
         required_skills = SKILLS_ANALYZER.fetch_extract_demand_skills(job_role)
         skill_gap_analysis = SKILLS_ANALYZER.analyze_skill_gap(job_role, students_current_skills, required_skills)
         job_role_data = {
@@ -401,11 +420,6 @@ def user_dashboard():
         }
         job_roles.insert_one(job_role_data)
         session['required_skills'] = required_skills
-        # return jsonify({
-        #     "required_skills": required_skills,
-        #     "skill_gap_analysis": skill_gap_analysis
-        # }), 200
-        required_skills = session['required_skills']
         online_courses = SERPER_CLIENT.find_courses(required_skills)
         
         # Prepare the dashboard data
