@@ -31,6 +31,7 @@ mongodb = client["IMAGINE"]
 company_collection = mongodb["company"]
 lessons_collection = mongodb["lessons"]
 courses_collection = mongodb["course"]
+train_program_collection = mongodb["train_programm"]
 lab_manuals_collection = mongodb["lab_manuals"]
 fs = GridFS(mongodb)
 
@@ -549,6 +550,55 @@ async def generate_training_program():
     lesson_type = required_skills.get('lesson_type')
 
     return jsonify({"message": "Query successful","response": True}), 200
+
+@company.route('/new-training-program', methods=['POST'])
+@cross_origin(supports_credentials=True)
+async def new_training_program():
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in", "response": False}), 401
+
+    data : dict = request.get_json()
+    job_role = data.get('jobRoles')
+    job_description = data.get('jobDescription')
+    required_skills =  data.get('requiredSkills')
+
+    new_train_program = {
+        "job_role":job_role,
+        "job_description":job_description,
+        "required_skills":required_skills.split(','),
+        "company_id":company_id,
+        "program_code":ServerUtils.generate_program_code(train_program_collection, length=6)
+    }
+
+    result = train_program_collection.insert_one(new_train_program)
+    new_train_program["_id"] = str(result.inserted_id)
+
+    return jsonify({"message": "Trainning program successfully added", "new_train_program":new_train_program }), 200
+
+@company.route('/get-training-program', methods=['GET'])
+@cross_origin(supports_credentials=True)
+async def get_training_program():
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in.", "response": False}), 401
+
+    train_programs = list(train_program_collection.find({"company_id": company_id}))
+    
+    data = [
+        {
+            'id': str(programs['_id']),
+            'job_role': programs.get('job_role'),
+            'job_description': programs.get('job_description'),
+            'required_skills': programs.get('required_skills'),
+            'program_code': programs.get('program_code'),
+        }
+        for programs in train_programs
+    ]
+    return jsonify({"programs": data, "response": True}), 200
+
+
+
 
 @company.route('/logout', methods=['GET'])
 @cross_origin(supports_credentials=True)
