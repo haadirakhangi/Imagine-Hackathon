@@ -9,75 +9,117 @@ import {
   Flex,
   Spinner,
   IconButton,
-  Switch,
   useColorModeValue,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Textarea,
 } from '@chakra-ui/react';
 import { Navbar } from '../../components/navbar';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { DeleteIcon } from '@chakra-ui/icons';
 
-type Course = {
+type TrainingProgram = {
   id: string;
-  course_name: string;
-  num_of_lectures: number;
-  course_code: string;
-  lessons_data: any;
+  program_name: string;
+  description: string;
+  program_code: string;
+  job_description: string;
 };
 
 const TeacherDashboard = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [trainingPrograms, setTrainingPrograms] = useState<TrainingProgram[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [jobRole, setJobRole] = useState('');
+  const [jobDescription, setJobDescription] = useState('');
+  const [requiredSkills, setRequiredSkills] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchTrainingPrograms = async () => {
       try {
-        const response = await axios.get('/api/company/get-courses');
-        setCourses(response.data.courses);
+        const response = await axios.get('/api/company/get-training-programs');
+        setTrainingPrograms(response.data.programs);
       } catch (error) {
-        console.error('Error fetching courses:', error);
+        console.error('Error fetching training programs:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCourses();
+    fetchTrainingPrograms();
   }, []);
 
-  const handleViewLessons = (course: Course) => {
-    localStorage.setItem('course_name', course.course_name);
-    localStorage.setItem('course_id', course.id);
+  const handleViewSessions = (program: TrainingProgram) => {
+    localStorage.setItem('program_name', program.program_name);
+    localStorage.setItem('program_id', program.id);
     navigate('/company/scheduler');
   };
 
-  const handleCopyCourseCode = (courseCode: string) => {
-    navigator.clipboard.writeText(courseCode).then(() => {
+  const handleCopyProgramCode = (programCode: string) => {
+    navigator.clipboard.writeText(programCode).then(() => {
       toast({
-        title: "Course Code Copied!",
-        description: `Course code ${courseCode} has been copied to clipboard.`,
-        status: "success",
+        title: 'Program Code Copied!',
+        description: `Program code ${programCode} has been copied to clipboard.`,
+        status: 'success',
         duration: 3000,
         isClosable: true,
       });
     }).catch((error) => {
       toast({
-        title: "Failed to Copy",
-        description: "An error occurred while copying the course code.",
-        status: "error",
+        title: 'Failed to Copy',
+        description: 'An error occurred while copying the program code.',
+        status: 'error',
         duration: 3000,
         isClosable: true,
       });
     });
   };
 
+  const handleCreateProgram = async () => {
+    try {
+      const response = await axios.post('/company/new-training-program', {
+        jobRole,
+        jobDescription,
+        requiredSkills,
+      });
+      toast({
+        title: 'Training Program Created!',
+        description: 'Your training program has been successfully created.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      setTrainingPrograms((prev) => [...prev, response.data.newProgram]);
+      setIsModalOpen(false);
+      setJobRole('');
+      setJobDescription('');
+      setRequiredSkills('');
+    } catch (error) {
+      toast({
+        title: 'Failed to Create Program',
+        description: 'An error occurred while creating the training program.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   if (loading) {
     return (
       <Flex justify="center" align="center" height="90vh">
         <Spinner size="xl" color="purple.500" />
-        <Heading ml={4}>Fetching Courses...</Heading>
+        <Heading ml={4}>Fetching Training Programs...</Heading>
       </Flex>
     );
   }
@@ -85,25 +127,27 @@ const TeacherDashboard = () => {
   return (
     <div>
       <Navbar />
-      <Box p={5}>
-        <Heading textAlign="center" mb={6} color="purple.600">
-          My Courses
-        </Heading>
-  
-        {courses.length === 0 ? (
+      <Box p={5} position="relative">
+        <Flex justify="space-between" alignItems="center" mb={6}>
+          <Heading textAlign="center" color="purple.600">
+            My Training Programs
+          </Heading>
+          <Button colorScheme="purple" onClick={() => setIsModalOpen(true)}>
+            Create New Training Program
+          </Button>
+        </Flex>
+
+        {trainingPrograms.length === 0 ? (
           <Flex justify="center" align="center" height="50vh">
             <Heading color="gray.500" size="lg">
-              No courses generated yet.
+              No training programs created yet.
             </Heading>
           </Flex>
         ) : (
-          <Grid
-            gap={6}
-            templateColumns="repeat(auto-fit, minmax(250px, 0.2fr))"
-          >
-            {courses.map((course) => (
+          <Grid gap={6} templateColumns="repeat(auto-fit, minmax(250px, 0.2fr))">
+            {trainingPrograms.map((program) => (
               <Box
-                key={course.id}
+                key={program.id}
                 position="relative"
                 p={5}
                 borderWidth="1px"
@@ -115,44 +159,34 @@ const TeacherDashboard = () => {
               >
                 <Flex justifyContent="space-between" alignItems="center" mb={4}>
                   <IconButton
-                    aria-label="Delete Course"
+                    aria-label="Delete Program"
                     icon={<DeleteIcon />}
                     size="sm"
                     colorScheme="red"
-                    // onClick={() => handleDeleteCourse(course.id)}
+                    // onClick={() => handleDeleteProgram(program.id)}
                   />
-                  <Flex alignItems="center">
-                    <Text fontSize="sm" mr={2}>
-                      Private
-                    </Text>
-                    <Switch
-                      colorScheme="purple"
-                      // onChange={() => handlePrivacyToggle(course.id)}
-                      // isChecked={course.isPublic}
-                    />
-                    <Text fontSize="sm" ml={2}>
-                      Public
-                    </Text>
-                  </Flex>
                 </Flex>
                 <VStack align="start" spacing={3} flex="1">
                   <Text fontWeight="bold" fontSize="lg" color="purple.500">
-                    {course.course_name}
+                    {program.program_name}
                   </Text>
                   <Text fontSize="sm">
-                    Course Code:{" "}
+                    Program Code:{" "}
                     <Text
                       as="span"
                       fontWeight="bold"
                       color="purple.600"
                       cursor="pointer"
-                      onClick={() => handleCopyCourseCode(course.course_code)}
+                      onClick={() => handleCopyProgramCode(program.program_code)}
                     >
-                      {course.course_code}
+                      {program.program_code}
                     </Text>
                   </Text>
-                  <Text fontSize="sm">
-                    Number of Lectures: {course.num_of_lectures}
+                  <Text fontSize="sm" noOfLines={3}>
+                    <b>Description:</b> {program.description}
+                  </Text>
+                  <Text fontSize="sm" noOfLines={3}>
+                    <b>Job Description:</b> {program.job_description}
                   </Text>
                 </VStack>
                 <Button
@@ -162,18 +196,53 @@ const TeacherDashboard = () => {
                   color="white"
                   _hover={{ bg: "purple.500" }}
                   mt={3}
-                  onClick={() => handleViewLessons(course)}
+                  onClick={() => handleViewSessions(program)}
                 >
-                  View Lessons
+                  View Details
                 </Button>
               </Box>
             ))}
           </Grid>
         )}
+
+        {/* Modal for creating new training program */}
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Create New Training Program</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <VStack spacing={4}>
+                <Input
+                  placeholder="Job Role"
+                  value={jobRole}
+                  onChange={(e) => setJobRole(e.target.value)}
+                />
+                <Textarea
+                  placeholder="Job Description"
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                />
+                <Input
+                  placeholder="Required Skills (comma-separated)"
+                  value={requiredSkills}
+                  onChange={(e) => setRequiredSkills(e.target.value)}
+                />
+              </VStack>
+            </ModalBody>
+            <ModalFooter>
+              <Button colorScheme="purple" onClick={handleCreateProgram}>
+                Create
+              </Button>
+              <Button variant="ghost" onClick={() => setIsModalOpen(false)} ml={3}>
+                Cancel
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       </Box>
     </div>
   );
-  
 };
 
 export default TeacherDashboard;
