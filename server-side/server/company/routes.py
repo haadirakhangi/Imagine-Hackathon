@@ -8,6 +8,7 @@ from api.serper_client import SerperProvider
 from core.rag import MultiModalRAG, SimpleRAG
 from server.constants import *
 from server.utils import ServerUtils
+from gridfs import GridFS
 import json
 import uuid
 import re
@@ -21,64 +22,49 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-teachers = Blueprint(name='teachers', import_name=__name__, url_prefix="/teacher")
+company = Blueprint(name='company', import_name=__name__, url_prefix="/company")
 password = quote_plus(os.getenv("MONGO_PASS"))
-uri = "mongodb+srv://rachit:" + password +"@cluster0.xjqiw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+uri = "mongodb+srv://mongouser:" + password +"@cluster0.rcrwl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 client = MongoClient(uri, server_api=ServerApi('1'))
 
-mongodb = client["FYP"]
-teachers_collection = mongodb["teacher"]
+mongodb = client["IMAGINE"]
+company_collection = mongodb["company"]
 lessons_collection = mongodb["lessons"]
 courses_collection = mongodb["course"]
 lab_manuals_collection = mongodb["lab_manuals"]
+fs = GridFS(mongodb)
 
-@teachers.route('/register', methods=['POST'])
+@company.route('/register', methods=['POST'])
 def register():
-    first_name = request.form.get('first_name')
-    last_name = request.form.get('last_name')
-    email = request.form.get('email')
+    company_name = request.form.get('company_name')
+    user_name = request.form.get('user_name')
+    company_mail = request.form.get('company_mail')
     password = request.form.get('password')
-    college_name = request.form.get('college_name')
-    department = request.form.get('department')
-    experience = request.form.get('experience')
-    phone_number = request.form.get('phone_number')
-    qualification = request.form.get('qualification')
-    subjects = request.form.get('subjects')
-    country = request.form.get('country')
-    state = request.form.get('state')
-    city = request.form.get('city')
-    gender = request.form.get('gender')
-    age = request.form.get('age')
+    company_logo = request.files.get('company_logo')
+    if company_logo and company_logo.filename.split('.')[-1].lower() in ['png', 'jpeg', 'jpg', 'svg']:
+        filename = secure_filename(company_logo.filename)
+        logo_id = fs.put(company_logo, filename=filename)
+    else:
+        return jsonify({"message": "Invalid file format. Only .png, .jpeg, and .jpg are allowed."}), 400
 
-    if not first_name or not last_name or not email or not password:
-        return jsonify({"message": "First name, last name, email, and password are required."}), 400
+    if not company_name or not user_name or not company_mail or not password:
+        return jsonify({"message": "Company name, User name, email, and password are required."}), 400
 
-    if teachers_collection.find_one({"email": email}):
+    if company_collection.find_one({"email": company_mail}):
         return jsonify({"message": "User already exists", "response": False}), 201
 
-    new_teacher = {
-        "first_name": first_name,
-        "last_name": last_name,
-        "email": email,
+    new_company = {
+        "company_name": company_name,
+        "user_name": user_name,
+        "email": company_mail,
         "password": generate_password_hash(password),
-        "college_name": college_name,
-        "department": department,
-        "experience": experience,
-        "phone_number": phone_number,
-        "qualification": qualification,
-        "subjects": subjects,
-        "country": country,
-        "state": state,
-        "city": city,
-        "gender": gender,
-        "age": age,
+        "logo_id": str(logo_id)
     }
 
-    teachers_collection.insert_one(new_teacher)
-
+    company_collection.insert_one(new_company)
     return jsonify({"message": "Registration successful!", "response": True}), 200
 
-@teachers.route('/login', methods=['POST'])
+@company.route('/login', methods=['POST'])
 def login():
     data : dict = request.get_json()
     email = data.get('email')
@@ -87,19 +73,19 @@ def login():
     if not email or not password:
         return jsonify({"message": "Email and password are required."}), 400
 
-    teacher = teachers_collection.find_one({"email": email})
+    company = company_collection.find_one({"email": email})
 
-    if teacher is None or not check_password_hash(teacher.get("password"), password):
+    if company is None or not check_password_hash(company.get("password"), password):
         return jsonify({"message": "Invalid email or password."}), 401
 
-    session['teacher_id'] = str(teacher["_id"])
-    return jsonify({"message": "Login successful!", "teacher_id": str(teacher["_id"]), "response": True}), 200
+    session['company_id'] = str(company["_id"])
+    return jsonify({"message": "Login successful!", "company_id": str(company["_id"]), "response": True}), 200
 
-@teachers.route('/create-course', methods=['POST'])
+@company.route('/create-course', methods=['POST'])
 def create_course():
-    teacher_id = session.get('teacher_id')
-    if teacher_id is None:
-        return jsonify({"message": "Teacher not logged in", "response": False}), 401
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in", "response": False}), 401
 
     try:
         course_name = request.form['course_name']
@@ -110,7 +96,7 @@ def create_course():
         new_course = {
             "course_name": course_name,
             "num_of_lectures": num_lectures,
-            "teacher_id": teacher_id,
+            "company_id": company_id,
             "lessons_data": lessons,
             "course_code": course_code,
         }
@@ -129,13 +115,13 @@ def create_course():
     except Exception as e:
         return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
       
-@teachers.route('/get-courses', methods=['GET'])
+@company.route('/get-courses', methods=['GET'])
 def get_courses():
-    teacher_id = session.get('teacher_id')
-    if teacher_id is None:
-        return jsonify({"message": "Teacher not logged in.", "response": False}), 401
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in.", "response": False}), 401
 
-    courses = list(courses_collection.find({"teacher_id": teacher_id}))
+    courses = list(courses_collection.find({"company_id": company_id}))
     
     courses_data = [
         {
@@ -149,22 +135,22 @@ def get_courses():
     ]
     return jsonify({"courses": courses_data, "response": True}), 200
 
-@teachers.route('/fetch-lessons', methods=['POST'])
+@company.route('/fetch-lessons', methods=['POST'])
 def fetch_lessons():
-    teacher_id = session.get('teacher_id')
+    company_id = session.get('company_id')
     data = request.json
     course_id = data.get('course_id')
     
-    if teacher_id is None:
-        return jsonify({"message": "Teacher not logged in.", "response": False}), 401
+    if company_id is None:
+        return jsonify({"message": "company not logged in.", "response": False}), 401
 
     if course_id is None:
         return jsonify({"message": "Course ID not found in the request.", "response": False}), 400
 
-    course = courses_collection.find_one({"_id": ObjectId(course_id), "teacher_id": teacher_id})
+    course = courses_collection.find_one({"_id": ObjectId(course_id), "company_id": company_id})
 
     if course is None:
-        return jsonify({"message": "Course not found for this teacher."}), 404
+        return jsonify({"message": "Course not found for this company."}), 404
 
     lessons_data : dict = json.loads(course.get("lessons_data", "{}"))
     lesson_statuses = []
@@ -206,11 +192,11 @@ def fetch_lessons():
         "manual_ids": manual_ids
     }), 200
 
-@teachers.route('/multimodal-rag-submodules', methods=['POST'])
+@company.route('/multimodal-rag-submodules', methods=['POST'])
 async def multimodal_rag_submodules():
-    teacher_id = session.get('teacher_id')
-    if teacher_id is None:
-        return jsonify({"message": "Teacher not logged in", "response": False}), 401
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in", "response": False}), 401
     
     if 'files[]' not in request.files:
         files = []
@@ -360,17 +346,17 @@ async def multimodal_rag_submodules():
     print("\nGenerated Submodules:\n", submodules)
     return jsonify({"message": "Query successful", "submodules": submodules, "response": True}), 200
 
-@teachers.route('/update-submodules', methods=['POST'])
+@company.route('/update-submodules', methods=['POST'])
 def update_submodules():
     updated_submodules = request.get_json()
     session['submodules'] = updated_submodules
     return jsonify({'message': 'Submodules updated successfully'}), 200
 
-@teachers.route('/multimodal-rag-content', methods=['GET'])
+@company.route('/multimodal-rag-content', methods=['GET'])
 async def multimodal_rag_content():
-    teacher_id = session.get('teacher_id')
-    if teacher_id is None:
-        return jsonify({"message": "Teacher not logged in", "response": False}), 401
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in", "response": False}), 401
     
     is_multimodal_rag = session.get("is_multimodal_rag")
     search_web = session.get("search_web")
@@ -439,11 +425,11 @@ async def multimodal_rag_content():
         final_content = ServerUtils.json_list_to_markdown(content_list)
         return jsonify({"message": "Query successful", "relevant_images": relevant_images_list, "content": final_content, "response": True}), 200
 
-@teachers.route('/add-lesson', methods=['POST'])
+@company.route('/add-lesson', methods=['POST'])
 def add_lesson():
-    teacher_id = session.get('teacher_id')
-    if teacher_id is None:
-        return jsonify({"message": "Teacher not logged in.", "response": False}), 401
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in.", "response": False}), 401
 
     data : dict = request.get_json()
     title = data.get('title')
@@ -459,7 +445,7 @@ def add_lesson():
 
     if lesson_id:
         lesson : dict = lessons_collection.find_one({"_id": ObjectId(lesson_id)})
-        if not lesson or lesson.get("teacher_id") != teacher_id:
+        if not lesson or lesson.get("company_id") != company_id:
             return jsonify({"message": "Lesson not found or you do not have permission to edit it."}), 404
         
         lessons_collection.update_one(
@@ -478,7 +464,7 @@ def add_lesson():
             "relevant_images": json.dumps(relevant_images),
             "uploaded_images": json.dumps(uploaded_images),
             "markdown_images": json.dumps(markdown_images),
-            "teacher_id": teacher_id,
+            "company_id": company_id,
             "course_id": course_id
         }
         result = lessons_collection.insert_one(new_lesson)
@@ -487,7 +473,7 @@ def add_lesson():
     lesson_id_to_return = lesson_id if lesson_id else new_lesson_id
     return jsonify({"message": "Lesson saved successfully!", "lesson_id": lesson_id_to_return, "response": True}), 200
 
-@teachers.route('/get-lesson', methods=['POST'])
+@company.route('/get-lesson', methods=['POST'])
 def get_lesson():
     data = request.get_json()
     lesson_id = data.get('lesson_id')
@@ -505,21 +491,21 @@ def get_lesson():
         "relevant_images": lesson.get("relevant_images"),
         "markdown_images": lesson.get("markdown_images"),
         "uploaded_images": lesson.get("uploaded_images"),
-        "teacher_id": lesson.get("teacher_id"),
+        "company_id": lesson.get("company_id"),
         "course_id": lesson.get("course_id")
     }
 
     return jsonify(lesson_data), 200
 
-@teachers.route('/generate-lesson', methods=['POST'])
-async def generate_lesson():
-    teacher_id = session.get('teacher_id')
-    if teacher_id is None:
-        return jsonify({"message": "Teacher not logged in", "response": False}), 401
+@company.route('/generate-course', methods=['POST'])
+async def generate_course():
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in", "response": False}), 401
 
-    num_lectures = request.form.get('num_lectures')
-    course_name = request.form.get('course_name')
-    file = request.files.get('syllabus')
+    num_lectures = request.form.get('num_lectures', None)
+    course_name = request.form.get('course_name', None) 
+    file = request.files.get('syllabus', None)
     current_dir = os.path.dirname(__file__)
     uploads_path = os.path.join(current_dir, 'uploaded-documents', 'syllabus')
     if not os.path.exists(uploads_path):
@@ -538,7 +524,33 @@ async def generate_lesson():
     output = LESSON_PLANNER.generate_lesson_plan(course_name=course_name, context=relevant_text, num_lectures=num_lectures)
     return jsonify({"message": "Query successful", "lessons": output, "response": True}), 200
 
-@teachers.route('/logout', methods=['GET'])
+@company.route('/generate-training-program', methods=['POST'])
+@cross_origin(supports_credentials=True)
+async def generate_training_program():
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in", "response": False}), 401
+
+    job_role : str = request.form.get('job_role')
+    required_skills : dict = request.form.get('required_skills')
+    scenarios : list = request.form.get('scenarios')
+    company_id = session.get('company_id')
+    if company_id is None:
+        return jsonify({"message": "company not logged in", "response": False}), 401
+    
+    if 'files[]' not in request.files:
+        files = []
+    else:
+        files = request.files.getlist('files[]')
+    skill_names : list = required_skills['skill_names']
+    links = required_skills.get('links')
+    web_search = required_skills.get('web_search')
+    pdfs = required_skills.get('pdfs')
+    lesson_type = required_skills.get('lesson_type')
+
+    return jsonify({"message": "Query successful","response": True}), 200
+
+@company.route('/logout', methods=['GET'])
 @cross_origin(supports_credentials=True)
 def logout():
     session.clear()
