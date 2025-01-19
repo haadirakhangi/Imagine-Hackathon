@@ -49,7 +49,7 @@ const AssessmentPage = () => {
 
   useEffect(() => {
     if (Object.values(phases).every((phase) => phase)) {
-      navigate("/student/job-roles");
+      navigate("/student/dashboard");
     }
   }, [phases, navigate]);
 

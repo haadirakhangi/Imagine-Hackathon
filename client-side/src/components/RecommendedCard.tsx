@@ -1,33 +1,23 @@
 import React, { useState } from 'react';
 import {
-  Box, Stack, Heading, Image, Card, CardBody, CardFooter, Button, Divider, ButtonGroup, Flex, Center, Grid
+  Box, Stack, Heading, Image, Card, CardBody, CardFooter, Button, Divider, ButtonGroup, Flex, Text
 } from '@chakra-ui/react';
 import { useColorModeValue } from '@chakra-ui/react';
 import courseraLogo from '../assets/cards/coursera.png'; // Import Coursera icon
 import upgradLogo from '../assets/cards/upgrad.jpg'; // Import upGrad icon
-import image1 from '../assets/cards/image1.jpg';
-import image2 from '../assets/cards/image2.jpg';
-import image3 from '../assets/cards/image3.jpg';
-import image4 from '../assets/cards/image4.jpg';
-import image5 from '../assets/cards/image5.jpg';
-import image6 from '../assets/cards/image6.jpg';
-import image7 from '../assets/cards/image7.jpg';
-import image8 from '../assets/cards/image8.jpg';
-import image9 from '../assets/cards/image9.jpg';
-import image10 from '../assets/cards/image10.jpg';
 
 interface CourseCardProps {
   source: string;
   title: string;
+  logo: string; // Base64 string for the logo
   link: string;
+  job_description: string;
+  job_role: string;
+  program_code: string;
 }
 
-const RecommendedCard: React.FC<CourseCardProps> = ({ source, title, link }) => {
+const RecommendedCard: React.FC<CourseCardProps> = ({ source, title, logo, link, job_description, job_role, program_code }) => {
   const [isHovered, setIsHovered] = useState(false);
-
-  const images = [image1, image2, image3, image4, image5, image6, image7, image8, image9, image10];
-  const randomIndex = Math.floor(Math.random() * images.length);
-  const randomImage = images[randomIndex];
 
   // Map source names to their corresponding icons
   const sourceIcons: { [key: string]: string } = {
@@ -44,20 +34,26 @@ const RecommendedCard: React.FC<CourseCardProps> = ({ source, title, link }) => 
         <CardBody>
           <Flex direction="column" justify="space-between">
             <Image
-              src={randomImage}
-              alt='Random Image'
+              src={`data:image/png;base64,${logo}`} // Use the logo prop directly
+              alt='Course Logo'
               borderRadius='lg'
               h="230px"
+              objectFit="scale-down" // Ensure the logo fits nicely within the space
             />
+
             <Stack mt='3' spacing='3'>
               <Stack direction="row" align="center" spacing="2">
-                <Image
-                  src={courseraLogo}
-                  alt={`${source} logo`}
-                  boxSize="30px"
-                />
                 <Heading size='md'>{title}</Heading>
               </Stack>
+              <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
+                <strong>Role:</strong> {job_role}
+              </Text>
+              <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
+                <strong>Description:</strong> {job_description}
+              </Text>
+              <Text fontSize="sm" color={useColorModeValue('gray.600', 'gray.400')}>
+                <strong>Program Code:</strong> {program_code}
+              </Text>
             </Stack>
           </Flex>
         </CardBody>

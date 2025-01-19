@@ -152,123 +152,120 @@ const TeacherDashboard = () => {
             </Heading>
           </Flex>
         ) : (
-          <Grid gap={6} templateColumns="repeat(auto-fit, minmax(250px, 0.2fr))">
+            <Grid gap={6} templateColumns="repeat(3, 1fr)">
             {trainingPrograms.map((program) => (
               <Box
-                key={program.id}
-                position="relative"
-                p={5}
-                borderWidth="1px"
-                borderRadius="lg"
-                bg={useColorModeValue('gray.100', 'gray.700')}
-                color={useColorModeValue('gray.700', 'gray.100')}
-                boxShadow="lg"
-                maxWidth="350px"
+              key={program.id}
+              position="relative"
+              p={5}
+              borderWidth="1px"
+              borderRadius="lg"
+              bg={useColorModeValue('gray.100', 'gray.700')}
+              color={useColorModeValue('gray.700', 'gray.100')}
+              boxShadow="lg"
+              width={"full"}
               >
-                <Flex justifyContent="space-between" alignItems="center" mb={4}>
-                  <Text fontWeight="bold" fontSize="lg" color="purple.500">
-                    {program.job_role}
-                  </Text>
-                  <Menu>
-                    <MenuButton
-                      as={IconButton}
-                      aria-label="Options"
-                      icon={<IoMdMore />}
-                      variant="ghost"
-                      size="sm"
-                    />
-                    <MenuList>
-                      {/* <MenuItem onClick={() => handleDeleteProgram(program.id)}>Delete Program</MenuItem> */}
-                      <MenuItem display={"flex"} ><Text width={"full"}>Delete Program</Text>                  <IconButton
+              <Flex justifyContent="space-between" alignItems="center" mb={4}>
+                <Text fontWeight="bold" fontSize="lg" color="purple.500">
+                {program.job_role}
+                </Text>
+                <Menu>
+                <MenuButton
+                  as={IconButton}
+                  aria-label="Options"
+                  icon={<IoMdMore />}
+                  variant="ghost"
+                  size="sm"
+                />
+                <MenuList>
+                  <MenuItem display={"flex"} >
+                  <Text width={"full"}>Delete Program</Text>
+                  <IconButton
                     aria-label="Delete Course"
                     icon={<DeleteIcon />}
                     size="sm"
                     colorScheme="red"
-                    // onClick={() => handleDeleteCourse(course.id)}
-                  /></MenuItem>
-                      <MenuItem>
-                        <Box width={"full"}>
-                          <Text fontSize="sm" fontWeight="bold">Applied Emails:</Text>
-                          {appliedEmails.map((email, index) => (
-                            <Flex key={index} alignItems="center" width={"full"} justifyContent="space-between" mt={2}>
-                              <Text fontSize="sm" width={"full"}>{email}</Text>
-                              <Flex gap={2}>
-                                <IconButton
-                                  aria-label="Approve"
-                                  icon={<CheckIcon />}
-                                  size="xs"
-                                  colorScheme="green"
-                                // onClick={() => handleApproveEmail(email)}
-                                />
-                                <IconButton
-                                  aria-label="Reject"
-                                  icon={<CloseIcon />}
-                                  size="xs"
-                                  colorScheme="red"
-                                // onClick={() => handleRejectEmail(email)}
-                                />
-                              </Flex>
-                            </Flex>
-                          ))}
-                        </Box>
-
-                      </MenuItem>
-                        <MenuItem>                  <Flex alignItems="center">
-                          <Text fontSize="sm" mr={2}>
-                            Private
-                          </Text>
-                          <Switch
-                            colorScheme="purple"
-                          // onChange={() => handlePrivacyToggle(course.id)}
-                          // isChecked={course.isPublic}
-                          />
-                          <Text fontSize="sm" ml={2}>
-                            Public
-                          </Text>
-                        </Flex></MenuItem>
-                    </MenuList>
-                  </Menu>
-                </Flex>
-
-                <VStack align="start" spacing={3} flex="1">
-                  <Text fontSize="sm">
-                    <b>Program Code: </b>
-                    <Text
-                      as="span"
-                      fontWeight="bold"
-                      color="purple.600"
-                      cursor="pointer"
-                      onClick={() => handleCopyProgramCode(program.program_code)}
-                    >
-                      {program.program_code}
+                  />
+                  </MenuItem>
+                  <MenuItem>
+                  <Box width={"full"}>
+                    <Text fontSize="sm" fontWeight="bold">Applied Emails:</Text>
+                    {appliedEmails.map((email, index) => (
+                    <Flex key={index} alignItems="center" width={"full"} justifyContent="space-between" mt={2}>
+                      <Text fontSize="sm" width={"full"}>{email}</Text>
+                      <Flex gap={2}>
+                      <IconButton
+                        aria-label="Approve"
+                        icon={<CheckIcon />}
+                        size="xs"
+                        colorScheme="green"
+                      />
+                      <IconButton
+                        aria-label="Reject"
+                        icon={<CloseIcon />}
+                        size="xs"
+                        colorScheme="red"
+                      />
+                      </Flex>
+                    </Flex>
+                    ))}
+                  </Box>
+                  </MenuItem>
+                  <MenuItem>
+                  <Flex alignItems="center">
+                    <Text fontSize="sm" mr={2}>
+                    Private
                     </Text>
-                  </Text>
-                  <Text fontSize="sm" noOfLines={3}>
-                    <b>Job Description:</b> {program.job_description}
-                  </Text>
+                    <Switch
+                    colorScheme="purple"
+                    />
+                    <Text fontSize="sm" ml={2}>
+                    Public
+                    </Text>
+                  </Flex>
+                  </MenuItem>
+                </MenuList>
+                </Menu>
+              </Flex>
 
-                </VStack>
-
-                <Button
-                  size="sm"
-                  width="100%"
-                  bg="purple.600"
-                  color="white"
-                  _hover={{ bg: "purple.500" }}
-                  mt={3}
-                  onClick={() => handleViewSessions(program)}
+              <VStack align="start" spacing={3} flex="1">
+                <Text fontSize="sm">
+                <b>Program Code: </b>
+                <Text
+                  as="span"
+                  fontWeight="bold"
+                  color="purple.600"
+                  cursor="pointer"
+                  onClick={() => handleCopyProgramCode(program.program_code)}
                 >
-                  Generate Training Program
-                </Button>
+                  {program.program_code}
+                </Text>
+                </Text>
+                <Text fontSize="sm" noOfLines={3}>
+                <b>Job Description:</b> {program.job_description}
+                </Text>
+              </VStack>
+
+              <Button
+                size="sm"
+                width="100%"
+                bg="purple.600"
+                color="white"
+                _hover={{ bg: "purple.500" }}
+                mt={3}
+                onClick={() => handleViewSessions(program)}
+              >
+                Generate Training Program
+              </Button>
               </Box>
             ))}
-          </Grid>
+            </Grid>
         )}
 
         {/* Modal for creating new training program */}
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <ModalOverlay />
-          <ModalContent>
+          <ModalContent margin={"auto"}>
             <ModalHeader>Create New Training Program</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
@@ -291,10 +288,10 @@ const TeacherDashboard = () => {
               </VStack>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme="purple" onClick={handleCreateProgram}>
+              <Button width={"full"} colorScheme="purple" onClick={handleCreateProgram}>
                 Create
               </Button>
-              <Button variant="ghost" onClick={() => setIsModalOpen(false)} ml={3}>
+              <Button width={"full"} variant="ghost" onClick={() => setIsModalOpen(false)} ml={3}>
                 Cancel
               </Button>
             </ModalFooter>

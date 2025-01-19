@@ -124,7 +124,7 @@ const LessonsGrid = () => {
       <Tabs mt={3} isFitted variant="enclosed" colorScheme="purple">
         <TabList>
           <Tab _selected={{ bg: "purple.500", color: "white" }} >Lessons</Tab>
-          <Tab _selected={{ bg: "purple.500", color: "white" }}>Lab Manuals</Tab>
+          <Tab _selected={{ bg: "purple.500", color: "white" }}>Scenario Based Training</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -198,7 +198,7 @@ const LessonsGrid = () => {
           <TabPanel>
             <Box>
               <Heading textAlign="center" mb={6} color="purple.600">
-                Lab Manuals
+                Scenarios
               </Heading>
               {labManuals.length > 0 ? (
                 <Grid templateColumns="repeat(auto-fit, minmax(250px, 0.2fr))" gap={6}>
@@ -236,7 +236,7 @@ const LessonsGrid = () => {
                 </Grid>
               ) : (
                 <Text textAlign="center" color="gray.500">
-                  No Lab Manuals available.
+                  No Scenario Based Training Added yet.
                 </Text>
               )}
               <Button
@@ -244,7 +244,7 @@ const LessonsGrid = () => {
                 colorScheme="purple"
                 onClick={handleCreateLabManual}
               >
-                Create Lab Manual
+                Create New Scenario
               </Button>
             </Box>
           </TabPanel>

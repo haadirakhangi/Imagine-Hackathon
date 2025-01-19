@@ -215,21 +215,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                             <Text fontSize="sm">Save</Text>
                         </Flex>
                     </Tab>
-                    <Tab
-                        _hover={{ transform: 'scale(1.05)', backgroundColor: 'gray.100', border: 'none' }}
-                        _selected={{ bg: 'purple.500', color: 'white' }}
-                        padding={1}
-                        my={2}
-                        _focus={{ outline: 'none', boxShadow: 'none' }}
-                        width={["80px", "100px", "70px"]}
-                        borderRadius="md"
-                        onClick={() => handleSaveppt()}
-                    >
-                        <Flex direction="column" align="center">
-                            <FaSave style={{ marginBottom: '4px', fontSize: '24px' }} />
-                            <Text fontSize="sm">Download PPT</Text>
-                        </Flex>
-                    </Tab>
                 </TabList>
 
                 {activeTabIndex !== null && (
@@ -409,7 +394,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                     onDragOver={(e) => e.preventDefault()} overflowY="auto">
                                     {uploadedImages.length === 0 ? (
                                         <Box textAlign="center" p={4}>
-                                            No images available.
+                                            Drag and drop images here!
                                         </Box>
                                     ) : (
                                         <SimpleGrid columns={[2, 2, 2]}>
