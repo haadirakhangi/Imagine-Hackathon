@@ -5,16 +5,17 @@ class QuizGenerator:
         self.gemini_client = GeminiProvider()
     
     def generate_quiz_for_hard_skills(self, skills_list : list):
-        prompt = """You are a skilled quiz creator and you have expertise in creating quizzes on hard skills. You will receive a list of 5 skills as input. For each skill, generate an interactive quiz consisting of 3-5 multiple-choice questions with 4 options in each question, designed to assess the user's proficiency level.
+        prompt = """You are a skilled quiz creator and you have expertise in creating quizzes on hard skills. You will receive a list of 5 skills as input. For each skill, generate an interactive quiz consisting of 3 multiple-choice questions with 4 options in each question, designed to assess the user's proficiency level.
 
         **<INSTRUCTIONS>**
         1. Skill Input: The list of 5 skills will be provided below.
-        2. Quiz Generation: For each skill, create a multiple-choice quiz with 5-10 questions. Each question should:
+        2. Quiz Generation: For each skill, create a multiple-choice quiz with 3-5 questions. Each question should:
         * Be clear and unambiguous.
         * Have four plausible answer choices (A, B, C, D), including one correct answer.
         * Focus on practical application and real-world scenarios relevant to the skill.
         * Be designed to assess both theoretical knowledge and practical experience. Include questions that probe for depth of understanding beyond a superficial level.
         3. Gap Identification: Design questions that subtly probe for potential gaps in the user's understanding of each skill. These should be integrated naturally into the quiz, not stand out as obvious "trick" questions.
+        4. Skill Assessment: The quiz should be challenging and cover a range of difficulty levels to accurately assess the user's proficiency in the skill. The questions should be detailed and difficuly enough to differentiate between users with varying levels of expertise.
         **<INSTRUCTIONS/>**
 
         The output should be a list of JSON objects (each JSON object should correspond to a quiz question) with the following keys:

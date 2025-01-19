@@ -83,9 +83,12 @@ class GeminiProvider:
         with open(image2_path, 'rb') as f:
             image2_bytes = f.read()
 
+        mime_type1 = "image/" + os.path.splitext(image1_path)[1][1:]
+        mime_type2 = "image/" + os.path.splitext(image2_path)[1][1:]
+
         completion = self.gemini_client.models.generate_content(
             model= "gemini-1.5-flash",
-            contents=[prompt, types.Part.from_bytes(data=image1_bytes, mime_type=os.path.splitext(image1_path)[1] ), types.Part.from_bytes(data=image2_bytes, mime_type=os.path.splitext(image2_path)[1] ), prompt],
+            contents=[prompt, types.Part.from_bytes(data=image1_bytes, mime_type=mime_type1 ), types.Part.from_bytes(data=image2_bytes, mime_type=mime_type2 ), prompt],
         )
         return completion.text
     

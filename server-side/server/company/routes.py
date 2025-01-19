@@ -506,7 +506,8 @@ async def generate_course():
 
     num_lectures = request.form.get('num_lectures', None)
     course_name = request.form.get('course_name', None) 
-    course_topics = request.form.get('course_topics', None)
+    course_topics = request.form.get('course_topics', 
+                                     )
     output = LESSON_PLANNER.generate_lesson_plan(course_name=course_name, context=course_topics, num_lectures=num_lectures)
     return jsonify({"message": "Query successful", "lessons": output, "response": True}), 200
 
