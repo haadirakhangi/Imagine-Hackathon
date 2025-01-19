@@ -94,13 +94,6 @@ export const SkillAssess = ({userData} : {userData: UserData}) => {
         name: skill,
         Score: (userData.technical_assessment.knowledgeScores[skill].score / userData.technical_assessment.knowledgeScores[skill].maxScore) * 100,
     }));
-
-    const interestData = Object.keys(userData.technical_assessment.interestScores).map((skill) => ({
-        name: skill,
-        Score: (userData.technical_assessment.interestScores[skill].score / userData.technical_assessment.interestScores[skill].maxScore) * 100,
-    }));
-
-
     const onPieEnter = (_:number, index:number) => {
         setActiveIndex(index);
     };
@@ -134,34 +127,8 @@ export const SkillAssess = ({userData} : {userData: UserData}) => {
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
-                </Box>
-
-                <Box borderWidth="1px" borderRadius="lg" p={4} flex="1" boxShadow="lg">
-                    <Heading size="sm" mb={2} color="purple.600">
-                        Interest-Based Assessment
-                    </Heading>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie
-                                activeIndex={activeIndex}
-                                activeShape={renderActiveShape}
-                                data={interestData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={80}
-                                fill="#8884d8"
-                                dataKey="Score"
-                                onMouseEnter={onPieEnter}
-                            >
-                                {interestData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                        </PieChart>
-                    </ResponsiveContainer>
-                </Box>
-            </HStack>
+                </Box>            
+                </HStack>
 
             {/* Soft Skills */}
             <Heading size="lg" mb={8} color="purple.700">
