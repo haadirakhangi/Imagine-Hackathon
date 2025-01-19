@@ -13,13 +13,18 @@ import {
     VStack,
     Progress,
     Center,
-    useToast
+    useToast,
+    Stack,
+    Heading
 } from '@chakra-ui/react';
 import { Navbar } from '../../components/navbar';
 import axios from 'axios';
 import { UserProfile } from './UserProfile';
 import { SkillAssess } from './SkillAssess';
 import { RecommendCourses } from './RecommendCourses';
+import JobRoleCard from '../../components/JobRoleCard';
+import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer } from 'recharts';
+import NeedleChart from '../../components/NeedleChart'
 
 interface UserData {
     full_name: string;
@@ -38,7 +43,7 @@ interface UserData {
         knowledgeScores: { [key: string]: { score: number; maxScore: number } };
         interestScores: { [key: string]: { score: number; maxScore: number } };
     }
-    required_skills:  { [key: string]: number };
+    required_skills: { [key: string]: number };
 }
 
 const purpleTheme = extendTheme({
@@ -59,19 +64,37 @@ const Dashboard = () => {
     const [userData, setUserData] = useState<UserData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+        const [formattedData, setFormattedData] = useState<any>([]);
+        const [recommendations, setRecommendations] = useState<any>([]);
+    
     const strengthsAndWeaknesses = {
         strengths: ['Time Management', 'Prioritization', 'Delegation'],
         weaknesses: ['Communication', 'Stress Management', 'Articulation'],
         improvementAreas: ['Confidence Building', 'Presentation Skills', 'Risk Assessment'],
     };
 
+       const [skillGapData, setSkillGapData] = useState<any>(null);
+
     useEffect(() => {
 
         const fetchUserData = async () => {
             try {
                 const response = await axios.get('/api/student/user-dashboard', { withCredentials: true });
+                console.log(response)
                 setUserData(response.data.user_data);
+                setSkillGapData(response.data.user_data.skill_gap_analysis);
+                setRecommendations(response.data.user_data.recommendations)
+
+                const formatted = Object.entries(response.data.user_data.required_skills || {}).map(([key, value]) => ({
+                    skill: key,
+                    demand: value,
+                    fullMark: 150,
+                }));
+
+                setFormattedData(formatted)
                 setLoading(false);
+
+
             } catch (error) {
                 toast({
                     title: 'Failed to load questions.',
@@ -85,16 +108,33 @@ const Dashboard = () => {
         fetchUserData();
     }, [toast]);
 
-    if (loading) {
-        return <Center w="100%" h="100vh">
-            <VStack spacing={4}>
-                <Progress size="lg" isIndeterminate colorScheme="purple" w="90%" />
-                <Text fontSize="lg" color="purple.700">
-                    Loading your dashboard...
-                </Text>
-            </VStack>
-        </Center>
-    }
+    //     try {
+    //         // Send the job title as part of the POST request
+    //         const response = await axios.post('/api/student/skill-gap-analysis', { job_role });
+    //         setSkillGapData(response.data.skill_gap_analysis);
+    //         setInDemandData(response.data.required_skills)
+    //         const formatted = Object.entries(response.data.required_skills || {}).map(([key, value]) => ({
+    //             skill: key,
+    //             demand: value,
+    //             fullMark: 150,
+    //         }));
+    //         setFormattedData(formatted);
+    //     } catch (error) {
+    //         console.error('Error fetching skill gap data:', error);
+    //     } 
+    // };
+
+        const renderSkills = (skills: any) => {
+            if (!skills || typeof skills !== 'object') {
+                return <Text>No skills data available</Text>;
+            }
+            return Object.entries(skills).map(([skill, description]) => (
+                <Box key={skill} mb="3">
+                    <Heading size="sm">{skill}</Heading>
+                    <Text>{description}</Text>
+                </Box>
+            ));
+        };
 
     if (error) {
         return <Center><Text>{error}</Text></Center>;
@@ -118,9 +158,49 @@ const Dashboard = () => {
                         </TabPanel>
                         <TabPanel>
                             {userData && <SkillAssess userData={userData} />}
+
+                            <Box>
+                    <Box>
+                        {loading ? (
+                            <Box textAlign="center" p="5">
+                                <Text>Fetching your skill gap analysis...</Text>
+                                <Progress size="sm" isIndeterminate colorScheme="purple" mt="4" />
+                            </Box>
+                        ) : skillGapData ? (
+                            <Stack spacing="4">
+                                <Box mb={6}>
+                                    <Heading size="md" color="purple.600" mb={4}>
+                                        Required Skills:
+                                    </Heading>
+                                    <ResponsiveContainer width="100%" height={400}>
+                                        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={formattedData}>
+                                            <PolarGrid />
+                                            <PolarAngleAxis dataKey="skill" />
+                                            <PolarRadiusAxis />
+                                            <Radar name="Demand" dataKey="demand" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                                        </RadarChart>
+                                    </ResponsiveContainer>
+                                </Box>
+                                <Box>
+                                    <Heading size="md" color="purple.600" marginBottom={2}>Transferable Skills:</Heading>
+                                    {renderSkills(skillGapData.transferable_skills)}
+                                </Box>
+
+                                <Box>
+                                    <Heading size="md" color="purple.600" marginBottom={2}>Required Skill Development:</Heading>
+                                    {renderSkills(skillGapData.required_skill_development)}
+                                </Box>
+
+                                <NeedleChart level={skillGapData.journey_assessment.level} justification={skillGapData.journey_assessment.justification} />
+                            </Stack>
+                        ) : (
+                            <Text>No data available</Text>
+                        )}
+                    </Box>
+                </Box>
                         </TabPanel>
                         <TabPanel>
-                            <RecommendCourses recommendedCourses={userData.online_courses} />
+                            <RecommendCourses recommendedCourses={recommendations} />
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

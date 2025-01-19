@@ -20,11 +20,17 @@ import {
   ModalFooter,
   Input,
   Textarea,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Switch,
 } from '@chakra-ui/react';
 import { Navbar } from '../../components/navbar';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { DeleteIcon } from '@chakra-ui/icons';
+import { CheckIcon, CloseIcon, DeleteIcon } from '@chakra-ui/icons';
+import { IoMdMore } from "react-icons/io";
 
 type TrainingProgram = {
   id: string;
@@ -42,6 +48,8 @@ const TeacherDashboard = () => {
   const [requiredSkills, setRequiredSkills] = useState('');
   const toast = useToast();
   const navigate = useNavigate();
+
+  const appliedEmails = ['email1', 'email2', 'email3'];
 
   useEffect(() => {
     const fetchTrainingPrograms = async () => {
@@ -158,20 +166,73 @@ const TeacherDashboard = () => {
                 maxWidth="350px"
               >
                 <Flex justifyContent="space-between" alignItems="center" mb={4}>
-                  <IconButton
-                    aria-label="Delete Program"
-                    icon={<DeleteIcon />}
-                    size="sm"
-                    colorScheme="red"
-                    // onClick={() => handleDeleteProgram(program.id)}
-                  />
-                </Flex>
-                <VStack align="start" spacing={3} flex="1">
                   <Text fontWeight="bold" fontSize="lg" color="purple.500">
                     {program.job_role}
                   </Text>
+                  <Menu>
+                    <MenuButton
+                      as={IconButton}
+                      aria-label="Options"
+                      icon={<IoMdMore />}
+                      variant="ghost"
+                      size="sm"
+                    />
+                    <MenuList>
+                      {/* <MenuItem onClick={() => handleDeleteProgram(program.id)}>Delete Program</MenuItem> */}
+                      <MenuItem display={"flex"} ><Text width={"full"}>Delete Program</Text>                  <IconButton
+                    aria-label="Delete Course"
+                    icon={<DeleteIcon />}
+                    size="sm"
+                    colorScheme="red"
+                    // onClick={() => handleDeleteCourse(course.id)}
+                  /></MenuItem>
+                      <MenuItem>
+                        <Box width={"full"}>
+                          <Text fontSize="sm" fontWeight="bold">Applied Emails:</Text>
+                          {appliedEmails.map((email, index) => (
+                            <Flex key={index} alignItems="center" width={"full"} justifyContent="space-between" mt={2}>
+                              <Text fontSize="sm" width={"full"}>{email}</Text>
+                              <Flex gap={2}>
+                                <IconButton
+                                  aria-label="Approve"
+                                  icon={<CheckIcon />}
+                                  size="xs"
+                                  colorScheme="green"
+                                // onClick={() => handleApproveEmail(email)}
+                                />
+                                <IconButton
+                                  aria-label="Reject"
+                                  icon={<CloseIcon />}
+                                  size="xs"
+                                  colorScheme="red"
+                                // onClick={() => handleRejectEmail(email)}
+                                />
+                              </Flex>
+                            </Flex>
+                          ))}
+                        </Box>
+
+                      </MenuItem>
+                        <MenuItem>                  <Flex alignItems="center">
+                          <Text fontSize="sm" mr={2}>
+                            Private
+                          </Text>
+                          <Switch
+                            colorScheme="purple"
+                          // onChange={() => handlePrivacyToggle(course.id)}
+                          // isChecked={course.isPublic}
+                          />
+                          <Text fontSize="sm" ml={2}>
+                            Public
+                          </Text>
+                        </Flex></MenuItem>
+                    </MenuList>
+                  </Menu>
+                </Flex>
+
+                <VStack align="start" spacing={3} flex="1">
                   <Text fontSize="sm">
-                    <b>Program Code:{" "}</b>
+                    <b>Program Code: </b>
                     <Text
                       as="span"
                       fontWeight="bold"
@@ -185,7 +246,9 @@ const TeacherDashboard = () => {
                   <Text fontSize="sm" noOfLines={3}>
                     <b>Job Description:</b> {program.job_description}
                   </Text>
+
                 </VStack>
+
                 <Button
                   size="sm"
                   width="100%"

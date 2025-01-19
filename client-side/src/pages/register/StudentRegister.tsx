@@ -118,7 +118,7 @@ const StudentRegister = () => {
           mb={4}
           mt={8}
         >
-          Teacher Registration
+          User   Registration
         </Text>
         <Box
           bg={useColorModeValue('purple.200', 'purple.800')}

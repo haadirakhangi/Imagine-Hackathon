@@ -118,7 +118,7 @@ const TeacherDashboard = () => {
                 boxShadow="lg"
                 maxWidth="350px"
               >
-                <Flex justifyContent="space-between" alignItems="center" mb={4}>
+                {/* <Flex justifyContent="space-between" alignItems="center" mb={4}>
                   <IconButton
                     aria-label="Delete Course"
                     icon={<DeleteIcon />}
@@ -139,7 +139,7 @@ const TeacherDashboard = () => {
                       Public
                     </Text>
                   </Flex>
-                </Flex>
+                </Flex> */}
                 <VStack align="start" spacing={3} flex="1">
                   <Text fontWeight="bold" fontSize="lg" color="purple.500">
                     {course.course_name}
