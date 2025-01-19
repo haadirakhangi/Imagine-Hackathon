@@ -42,7 +42,7 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 mongodb = client["IMAGINE"]
 student_data = mongodb["student_data"]
 std_profile_coll = mongodb["profile"]
-job_roles = student_data["job_roles"] ####
+job_roles = mongodb["job_roles"]
 train_program_collection = mongodb["train_programm"]
 
 fs = GridFS(mongodb)
@@ -304,48 +304,48 @@ def get_recommendations():
         return jsonify({"error": str(e)}), 500
 
     
-@students.route('/skill-gap-analysis', methods=['POST'])
-@cross_origin(supports_credentials=True)
-def skill_gap_analysis():
-    # try:
-        if "student_id" not in session:
-            return jsonify({"error": "User not logged in"}), 401
+# @students.route('/skill-gap-analysis', methods=['POST'])
+# @cross_origin(supports_credentials=True)
+# def skill_gap_analysis():
+#     # try:
+#         if "student_id" not in session:
+#             return jsonify({"error": "User not logged in"}), 401
 
-        student_id = session["student_id"]
-        data: dict = request.json
-        job_role = data.get("job_role")
-        student_data : dict = std_profile_coll.find_one({"_id": ObjectId(student_id)})
-        if not student_data:
-            return jsonify({"error": "Student not found"}), 404
-        technical_assessment = student_data.get("technical_assessment", {})
-        knowledge_scores :dict = technical_assessment.get("knowledgeScores", {})
-        students_current_skills = {}
-        for field, scores in knowledge_scores.items():
-            score = scores.get("score", 0)
-            max_score = scores.get("maxScore", 1)  # Avoid division by zero
-            normalized_score = (score / max_score) * 10
-            students_current_skills[field]=normalized_score
-        existing_job_role_data = job_roles.find_one({"student_id": student_id, "job_role": job_role})
-        if existing_job_role_data:
-            session['required_skills'] = existing_job_role_data["required_skills"]
-            return jsonify({
-                "required_skills": existing_job_role_data["required_skills"],
-                "skill_gap_analysis": existing_job_role_data["skill_gap_analysis"]
-            }), 200
-        required_skills = SKILLS_ANALYZER.fetch_extract_demand_skills(job_role)
-        skill_gap_analysis = SKILLS_ANALYZER.analyze_skill_gap(job_role, students_current_skills, required_skills)
-        job_role_data = {
-            "student_id": student_id,
-            "job_role": job_role,
-            "required_skills": required_skills,
-            "skill_gap_analysis": skill_gap_analysis
-        }
-        job_roles.insert_one(job_role_data)
-        session['required_skills'] = required_skills
-        return jsonify({
-            "required_skills": required_skills,
-            "skill_gap_analysis": skill_gap_analysis
-        }), 200
+#         student_id = session["student_id"]
+#         data: dict = request.json
+#         job_role = data.get("job_role")
+#         student_data : dict = std_profile_coll.find_one({"_id": ObjectId(student_id)})
+#         if not student_data:
+#             return jsonify({"error": "Student not found"}), 404
+#         technical_assessment = student_data.get("technical_assessment", {})
+#         knowledge_scores :dict = technical_assessment.get("knowledgeScores", {})
+#         students_current_skills = {}
+#         for field, scores in knowledge_scores.items():
+#             score = scores.get("score", 0)
+#             max_score = scores.get("maxScore", 1)  # Avoid division by zero
+#             normalized_score = (score / max_score) * 10
+#             students_current_skills[field]=normalized_score
+#         existing_job_role_data = job_roles.find_one({"student_id": student_id, "job_role": job_role})
+#         if existing_job_role_data:
+#             session['required_skills'] = existing_job_role_data["required_skills"]
+#             return jsonify({
+#                 "required_skills": existing_job_role_data["required_skills"],
+#                 "skill_gap_analysis": existing_job_role_data["skill_gap_analysis"]
+#             }), 200
+#         required_skills = SKILLS_ANALYZER.fetch_extract_demand_skills(job_role)
+#         skill_gap_analysis = SKILLS_ANALYZER.analyze_skill_gap(job_role, students_current_skills, required_skills)
+#         job_role_data = {
+#             "student_id": student_id,
+#             "job_role": job_role,
+#             "required_skills": required_skills,
+#             "skill_gap_analysis": skill_gap_analysis
+#         }
+#         job_roles.insert_one(job_role_data)
+#         session['required_skills'] = required_skills
+#         return jsonify({
+#             "required_skills": required_skills,
+#             "skill_gap_analysis": skill_gap_analysis
+#         }), 200
 
     # except Exception as e:
     #     return jsonify({"error": str(e)}), 500
@@ -374,6 +374,28 @@ def user_dashboard():
         user_data : dict = std_profile_coll.find_one({"_id": ObjectId(student_id)})
         if not user_data:
             return jsonify({"error": "User not found"}), 404
+
+        student_skills = set([skill.strip().lower() for skill in user_data.get("top_skills", [])])
+        student_dream_job = user_data.get("dream_job", "").lower()
+        training_programs = train_program_collection.find()
+
+            # Recommendations list
+        recommendations = []
+
+        for program in training_programs:
+            # Extract program skills and job role
+            required_skills = set([skill.strip().lower() for skill in program.get("required_skills", [])])
+            job_role = program.get("job_role", "").lower()
+
+            # Check for skill match or dream job match
+            if student_skills & required_skills or student_dream_job == job_role:
+                recommendations.append({
+                    'id': str(program['_id'])   ,
+                    "job_role": program.get("job_role"),
+                    "job_description": program.get("job_description"),
+                    "required_skills": program.get("required_skills"),
+                    "program_code": program.get("program_code")
+                })
         
         technical_assessment = user_data.get("technical_assessment", {})
         knowledge_scores :dict = technical_assessment.get("knowledgeScores", {})
@@ -389,25 +411,26 @@ def user_dashboard():
             session['required_skills'] = existing_job_role_data["required_skills"]
             dashboard_data = {
                 "full_name": user_data.get("full_name", ""),
-                "age": user_data.get("age", ""),
-                "location": user_data.get("location", ""),
-                "preferred_language": user_data.get("preferred_language", ""),
+                # "age": user_data.get("age", ""),
+                # "location": user_data.get("location", ""),
+                # "preferred_language": user_data.get("preferred_language", ""),
                 "email": user_data.get("email", ""),
                 "gender": user_data.get("gender", ""),
                 "highest_education": user_data.get("highest_education", ""),
                 "field_of_study": user_data.get("field_of_study", ""),
                 "dream_job": user_data.get("dream_job", ""),
-                "interests": user_data.get("interests", []),
-                "challenges": user_data.get("challenges", ""),
-                "motivation": user_data.get("motivation", ""),
-                "learning_platforms": user_data.get("learning_platforms", ""),
+                # "interests": user_data.get("interests", []),
+                # "challenges": user_data.get("challenges", ""),
+                # "motivation": user_data.get("motivation", ""),
+                # "learning_platforms": user_data.get("learning_platforms", ""),
                 "top_skills": user_data.get("top_skills", []),
                 "resume_id": user_data.get("resume_id", ""),
                 "technical_assessment": user_data.get("technical_assessment", {}),
                 "soft_skill_assessment": user_data.get("soft_skill_assessment", {}),
                 "required_skills": required_skills,
                 "online_courses": online_courses,
-                "skill_gap_analysis": skill_gap_analysis
+                "skill_gap_analysis": skill_gap_analysis,
+                "recommendations":recommendations
             }
             return jsonify({'user_data' : dashboard_data}), 200
         required_skills = SKILLS_ANALYZER.fetch_extract_demand_skills(job_role)
@@ -443,7 +466,8 @@ def user_dashboard():
             "soft_skill_assessment": user_data.get("soft_skill_assessment", {}),
             "required_skills": required_skills,
             "online_courses": online_courses,
-            "skill_gap_analysis": skill_gap_analysis
+            "skill_gap_analysis": skill_gap_analysis,
+            "recommendations":recommendations
         }
 
         return jsonify({'user_data' : dashboard_data}), 200
