@@ -369,6 +369,8 @@ def user_dashboard():
     try:
         if "student_id" not in session:
             return jsonify({"error": "User not logged in"}), 401
+        
+        dashboard_data={}
 
         student_id = session.get("student_id")
         user_data : dict = std_profile_coll.find_one({"_id": ObjectId(student_id)})
@@ -384,16 +386,16 @@ def user_dashboard():
 
         for program in training_programs:
             # Extract program skills and job role
-            required_skills = set([skill.strip().lower() for skill in program.get("required_skills", [])])
+            tp_required_skills = set([skill.strip().lower() for skill in program.get("required_skills", [])])
             job_role = program.get("job_role", "").lower()
 
             # Check for skill match or dream job match
-            if student_skills & required_skills or student_dream_job == job_role:
+            if student_skills & tp_required_skills or student_dream_job == job_role:
                 recommendations.append({
-                    'id': str(program['_id'])   ,
+                    # 'id': str(program['_id']),
                     "job_role": program.get("job_role"),
                     "job_description": program.get("job_description"),
-                    "required_skills": program.get("required_skills"),
+                    "tp_required_skills": program.get("required_skills"),
                     "program_code": program.get("program_code")
                 })
         
@@ -417,21 +419,22 @@ def user_dashboard():
                 "email": user_data.get("email", ""),
                 "gender": user_data.get("gender", ""),
                 "highest_education": user_data.get("highest_education", ""),
-                "field_of_study": user_data.get("field_of_study", ""),
+                # "field_of_study": user_data.get("field_of_study", ""),
                 "dream_job": user_data.get("dream_job", ""),
                 # "interests": user_data.get("interests", []),
                 # "challenges": user_data.get("challenges", ""),
                 # "motivation": user_data.get("motivation", ""),
                 # "learning_platforms": user_data.get("learning_platforms", ""),
                 "top_skills": user_data.get("top_skills", []),
-                "resume_id": user_data.get("resume_id", ""),
+                # "resume_id": user_data.get("resume_id", ""),
                 "technical_assessment": user_data.get("technical_assessment", {}),
                 "soft_skill_assessment": user_data.get("soft_skill_assessment", {}),
-                "required_skills": required_skills,
-                "online_courses": online_courses,
-                "skill_gap_analysis": skill_gap_analysis,
+                "required_skills": existing_job_role_data.get("required_skills", {}),
+                # "online_courses": online_courses,
+                "skill_gap_analysis": existing_job_role_data.get("skill_gap_analysis", {}),
                 "recommendations":recommendations
             }
+            # print(dashboard_data)
             return jsonify({'user_data' : dashboard_data}), 200
         required_skills = SKILLS_ANALYZER.fetch_extract_demand_skills(job_role)
         skill_gap_analysis = SKILLS_ANALYZER.analyze_skill_gap(job_role, students_current_skills, required_skills)
@@ -443,37 +446,37 @@ def user_dashboard():
         }
         job_roles.insert_one(job_role_data)
         session['required_skills'] = required_skills
-        online_courses = SERPER_CLIENT.find_courses(required_skills)
+        # online_courses = SERPER_CLIENT.find_courses(required_skills)
         
         # Prepare the dashboard data
         dashboard_data = {
             "full_name": user_data.get("full_name", ""),
-            "age": user_data.get("age", ""),
-            "location": user_data.get("location", ""),
-            "preferred_language": user_data.get("preferred_language", ""),
+            # "age": user_data.get("age", ""),
+            # "location": user_data.get("location", ""),
+            # "preferred_language": user_data.get("preferred_language", ""),
             "email": user_data.get("email", ""),
             "gender": user_data.get("gender", ""),
             "highest_education": user_data.get("highest_education", ""),
-            "field_of_study": user_data.get("field_of_study", ""),
+            # "field_of_study": user_data.get("field_of_study", ""),
             "dream_job": user_data.get("dream_job", ""),
-            "interests": user_data.get("interests", []),
-            "challenges": user_data.get("challenges", ""),
-            "motivation": user_data.get("motivation", ""),
-            "learning_platforms": user_data.get("learning_platforms", ""),
+            # "interests": user_data.get("interests", []),
+            # "challenges": user_data.get("challenges", ""),
+            # "motivation": user_data.get("motivation", ""),
+            # "learning_platforms": user_data.get("learning_platforms", ""),
             "top_skills": user_data.get("top_skills", []),
-            "resume_id": user_data.get("resume_id", ""),
+            # "resume_id": user_data.get("resume_id", ""),
             "technical_assessment": user_data.get("technical_assessment", {}),
             "soft_skill_assessment": user_data.get("soft_skill_assessment", {}),
             "required_skills": required_skills,
-            "online_courses": online_courses,
+            # "online_courses": online_courses,
             "skill_gap_analysis": skill_gap_analysis,
             "recommendations":recommendations
         }
-
+        # print("here:", dashboard_data)
         return jsonify({'user_data' : dashboard_data}), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e), "dash":dashboard_data}), 500
     
 @students.route("/assessment-status", methods=["GET"])
 @cross_origin(supports_credentials=True)
