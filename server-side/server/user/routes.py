@@ -29,6 +29,7 @@ from urllib.parse import quote_plus
 from io import BytesIO
 from bson import ObjectId
 import fitz
+import base64
 from server.constants import *
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -44,6 +45,7 @@ student_data = mongodb["student_data"]
 std_profile_coll = mongodb["profile"]
 job_roles = mongodb["job_roles"]
 train_program_collection = mongodb["train_programm"]
+company_collection = mongodb["company"]
 
 fs = GridFS(mongodb)
 
@@ -391,12 +393,15 @@ def user_dashboard():
 
             # Check for skill match or dream job match
             if student_skills & tp_required_skills or student_dream_job == job_role:
+                company = company_collection.find_one({"_id": ObjectId(program.get("company_id"))})
+                logo = fs.get(ObjectId(company.get("logo_id"))).read()
+                logo_base64 = base64.b64encode(logo).decode('utf-8')
                 recommendations.append({
-                    # 'id': str(program['_id']),
                     "job_role": program.get("job_role"),
                     "job_description": program.get("job_description"),
                     "tp_required_skills": program.get("required_skills"),
-                    "program_code": program.get("program_code")
+                    "program_code": program.get("program_code"),
+                    "logo": logo_base64
                 })
         
         technical_assessment = user_data.get("technical_assessment", {})

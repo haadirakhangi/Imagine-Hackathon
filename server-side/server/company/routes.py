@@ -91,6 +91,7 @@ def create_course():
     # try:
     course_name = request.form['required_skill']
     num_lectures = request.form['num_lectures']
+    program_id = request.form['program_id']
     lessons = request.form['lessons']
     course_code = ServerUtils.generate_course_code(courses_collection, length=6)
 
@@ -100,6 +101,7 @@ def create_course():
         "company_id": company_id,
         "lessons_data": lessons,
         "course_code": course_code,
+        "program_id": program_id,
     }
 
     result = courses_collection.insert_one(new_course)
@@ -122,7 +124,9 @@ def get_courses():
     if company_id is None:
         return jsonify({"message": "company not logged in.", "response": False}), 401
 
-    courses = list(courses_collection.find({"company_id": company_id}))
+    program_id = request.args.get('program_id')
+    print("program_id", program_id)
+    courses = list(courses_collection.find({"program_id":program_id}))
     
     courses_data = [
         {
